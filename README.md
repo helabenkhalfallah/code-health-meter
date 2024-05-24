@@ -1,4 +1,4 @@
-# CodeHealthMeter
+# Code Health Meter
 
 This repository contains a set of tools and utilities for analyzing the quality of JavaScript and TypeScript code. It uses various metrics and methodologies to provide a comprehensive overview of the code's complexity, maintainability, and other important aspects.
 
