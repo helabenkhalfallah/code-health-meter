@@ -35,7 +35,7 @@ const {
 } = args?.values || {};
 
 if(!srcDir){
-  AppLogger.info('srcDir is require and must be a string (npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html")');
+  AppLogger.info('srcDir is require and must be a string (npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html")');
   process.exit(-1);
 }
 

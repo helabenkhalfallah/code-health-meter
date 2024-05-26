@@ -37,6 +37,11 @@ It was originally developed by Oman & Hagemeister in the early 1990s. You can re
     npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
 
+Or with `npx`:
+   ```
+   npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+   ```
+
 ## How to contribute?
 
 1. Clone the repository:
