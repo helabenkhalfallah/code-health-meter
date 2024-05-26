@@ -1,5 +1,16 @@
 # Code Health Meter
 
+# Table of Contents
+
+1. [Presentation]()
+2. [Key Features](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#key-features)
+3. [More Information About Metrics](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#more-information-about-metrics)
+4. [Installation and Usage](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#installation-and-usage)
+5. [Contributing](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#contributing)
+6. [License](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#license)
+
+## Presentation
+
 **CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation** of your code's maintainability, complexity, and size using a variety of established software metrics.
 
 Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. By applying formulas like the Halstead metrics and the Maintainability Index, we can obtain precise, objective measures of various aspects of the software’s quality:
@@ -30,6 +41,8 @@ Subjective methods for evaluating software quality often involve human judgment 
 
 While these methods can provide valuable insights, they lack the objectivity and precision of quantitative methods like Halstead metrics or cyclomatic complexity. Therefore, a combination of both subjective and objective methods is often used in practice for a comprehensive evaluation of software quality.
 
+---
+
 ## Key Features
 
 - **Maintainability Index**: This metric provides a single score that reflects the maintainability of your code. It takes into account factors such as cyclomatic complexity, Halstead volume, and lines of code.
@@ -44,6 +57,8 @@ While these methods can provide valuable insights, they lack the objectivity and
 
 By leveraging these metrics, CodeHealthMeter allows you to gain a deeper understanding of your code's health. 
 It helps you identify potential areas for improvement, making it an invaluable tool for maintaining high-quality, efficient, and maintainable code.
+
+---
 
 ## More information about metrics
 
@@ -60,6 +75,8 @@ You can read more about it on [Wikipedia](https://en.wikipedia.org/wiki/Halstead
 Maintainability Index is a software metric which measures how maintainable (easy to support and change) the source code is. 
 The maintainability index is calculated as a factored formula consisting of SLOC (Source Lines Of Code), Cyclomatic Complexity and Halstead volume. 
 It was originally developed by Oman & Hagemeister in the early 1990s. You can read more about it on [Wikipedia](https://learn.microsoft.com/en-us/visualstudio/code-quality/code-metrics-maintainability-index-range-and-meaning?view=vs-2022).
+
+---
 
 ## Installation and usage
 
@@ -168,6 +185,8 @@ Example of an HTML report:
 
 ![HTML_REPORT_2](HTML_REPORT_2.png)
 
+---
+
 ## Contributing
 
 Contributions are welcome! Please read the contributing guidelines before getting started.
@@ -190,7 +209,9 @@ Contributions are welcome! Please read the contributing guidelines before gettin
     ```
     npx scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
-   
+
+---
+
 ## License
 
 This project is licensed under the terms of the MIT license. See the LICENSE file for details.
