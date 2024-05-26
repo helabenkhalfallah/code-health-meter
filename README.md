@@ -1,6 +1,6 @@
 # Code Health Meter
 
-CodeHealthMeter is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation** of your code's maintainability, complexity, and size using a variety of established software metrics.
+**CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation** of your code's maintainability, complexity, and size using a variety of established software metrics.
 
 Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. By applying formulas like the Halstead metrics and the Maintainability Index, we can obtain precise, objective measures of various aspects of the software’s quality:
 
