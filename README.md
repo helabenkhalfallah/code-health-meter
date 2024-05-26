@@ -147,12 +147,12 @@ Contributions are welcome! Please read the contributing guidelines before gettin
     npm install
     ```
 
-3. Run the analysis on your codebase:
+3. To locally test the analysis you can run:
     ```
     npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
     ```
-    npxscan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    npx scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
    
 ## License
