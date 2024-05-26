@@ -177,34 +177,6 @@ Example of a JSON report:
         "score": "49.65 %"
       },
       {
-        "title": "Cyclomatic Complexity",
-        "score": "20 "
-      },
-      {
-        "title": "Program Length (N)",
-        "score": "540 "
-      },
-      {
-        "title": "Program Volume (V)",
-        "score": "3633.08 bit"
-      },
-      {
-        "title": "Difficulty Level (D)",
-        "score": "34.09 "
-      },
-      {
-        "title": "Implementation Effort (E) or Understanding",
-        "score": "123866.56 bit"
-      },
-      {
-        "title": "Number of estimated bugs in a module or function (B)",
-        "score": "1.21 "
-      },
-      {
-        "title": "Time (T) to implement or understand the program",
-        "score": "6881.48 s"
-      }
-    ],
     ...   
 ```
 
