@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
-import AppLogger from "./AppLogger.js";
-import CodeComplexityConfig from "../config/CodeComplexityConfig.js";
+import AppLogger from './AppLogger.js';
+import CodeComplexityConfig from '../config/CodeComplexityConfig.js';
 
 const {
  buildHtmlComplexityReports,
@@ -111,8 +111,8 @@ const buildTableHtmlData = (reportsByFile) => {
   return({
     tableHeaders,
     tableRows,
-  })
-}
+  });
+};
 
 /**
  * Formats the audit reports.
@@ -137,7 +137,7 @@ const formatReports = (auditReports, fileFormat) => {
   }
 
   return '';
-}
+};
 
 /**
  * Writes the audit to a file.
@@ -169,7 +169,7 @@ const writeAuditToFile = (auditReports, options) => {
     AppLogger.info(`[AuditUtils - writeAuditToFile] error:  ${error.message}`);
     return false;
   }
-}
+};
 
 /**
  * The AuditUtils object.

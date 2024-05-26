@@ -1,6 +1,6 @@
-import CodeComplexityAuditor from "./kernel/CodeComplexityAuditor.js";
-import AppLogger from "./commons/AppLogger.js";
-import AuditUtils from "./commons/AuditUtils.js";
+import CodeComplexityAuditor from './kernel/CodeComplexityAuditor.js';
+import AppLogger from './commons/AppLogger.js';
+import AuditUtils from './commons/AuditUtils.js';
 
 const{
   writeAuditToFile
@@ -22,4 +22,4 @@ AppLogger.info(`[AuditorWorker] codeComplexityReports:  ${codeComplexityReports?
 writeAuditToFile(codeComplexityReports, {
     fileName: 'MyAwesomeReport',
     fileFormat: 'html' // html or json
-})
+});

@@ -1,8 +1,8 @@
  
-import CodeComplexityConfig from "../config/CodeComplexityConfig.js";
-import CodeAnalysisUtils from "./CodeAnalysisUtils.js";
-import AuditUtils from "../commons/AuditUtils.js";
-import AppLogger from "../commons/AppLogger.js";
+import CodeComplexityConfig from '../config/CodeComplexityConfig.js';
+import CodeAnalysisUtils from './CodeAnalysisUtils.js';
+import AuditUtils from '../commons/AuditUtils.js';
+import AppLogger from '../commons/AppLogger.js';
 
 const {
   formatHalsteadReports,

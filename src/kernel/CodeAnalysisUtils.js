@@ -4,8 +4,9 @@ import glob from 'globby';
 import unixify from 'unixify';
 import {
   findCommonBase,
-} from '../code-analysis/helper/CodeAnalysisHelper.js';
-import CodeComplexityReporter from '../code-analysis/reporters/CodeComplexityReporter.js';
+} from './CodeAnalysisHelper.js';
+import CodeComplexityReporter from './CodeComplexityReporter.js';
+import AppLogger from '../commons/AppLogger.js';
 
 /**
  * An object containing the complexity analyzer.
@@ -34,7 +35,7 @@ const complexityReportOptions = {
  */
 const printLog = (args, options = {}) => {
   if (!options.quiet) {
-    console.log(args);
+    AppLogger.info(args);
   }
 };
 

@@ -14,6 +14,10 @@ export default [
           presets: ["@babel/preset-env"],
         }
       }
+    },
+    rules: {
+      quotes: ["error", "single"],
+      semi: ["error", "always"],
     }
   }
 ];

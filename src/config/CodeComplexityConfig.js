@@ -1,4 +1,4 @@
-import Matcher from "../commons/Matcher.js";
+import Matcher from '../commons/Matcher.js';
 
 /**
  * Format Halstead Metrics Reports
@@ -23,7 +23,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Program Length (N)',
-      description: `Program Length (N): A higher number indicates a longer and potentially more complex program.`,
+      description: 'Program Length (N): A higher number indicates a longer and potentially more complex program.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -39,7 +39,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Program Volume (V)',
-      description: `Program Volume (V): A higher volume means the program contains more information, which can make the program more difficult to understand and maintain.`,
+      description: 'Program Volume (V): A higher volume means the program contains more information, which can make the program more difficult to understand and maintain.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -55,7 +55,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Difficulty Level (D)',
-      description: `Difficulty Level (D): A higher difficulty level means the program is more likely to contain errors. A lower number is preferable.`,
+      description: 'Difficulty Level (D): A higher difficulty level means the program is more likely to contain errors. A lower number is preferable.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -71,7 +71,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Implementation Effort (E) or Understanding',
-      description: `Implementation Effort (E): A higher effort means the program requires more work to be implemented. A lower number is preferable.`,
+      description: 'Implementation Effort (E): A higher effort means the program requires more work to be implemented. A lower number is preferable.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -87,7 +87,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Number of estimated bugs in a module or function (B)',
-      description: `Number of bugs provided (B): A higher number means the program is likely to contain more errors. A lower number is preferable.`,
+      description: 'Number of bugs provided (B): A higher number means the program is likely to contain more errors. A lower number is preferable.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -103,7 +103,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
       type: 'code-complexity',
       category: 'halstead',
       title: 'Time (T) to implement or understand the program',
-      description: `Time to implement (T): A longer time means the program takes longer to implement. A lower number is preferable.`,
+      description: 'Time to implement (T): A longer time means the program takes longer to implement. A lower number is preferable.',
       status: null,
       scoreMax: 0,
       scoreMin: 0,
@@ -193,7 +193,7 @@ The maintainability index report presents the maintainability, McCabe and Halste
     scoreUnit: '%',
     file,
   });
-}
+};
 
 /**
  * Build Html Complexity Reports
