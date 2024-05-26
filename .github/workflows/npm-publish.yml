@@ -15,26 +15,46 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: 22
-      - run: npm install -g pnpm 
-      - run: pnpm install
-      - run: pnpm lint
+
+      - name: Installing pnpm 
+        run: npm install -g pnpm 
+
+      - name: Installing NPM deps
+        run: pnpm install
+
+      - name: Verifying lint
+        run: pnpm lint
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-      - run: npm install -g pnpm 
-      - run: pnpm install
-      - run: pnpm lint
-      - run: npm publish --provenance --access public
+     
+      - name: Installing pnpm    
+        run: npm install -g pnpm 
+
+      - name: Installing NPM deps
+        run: pnpm install
+
+      - name: Verifying lint
+        run: pnpm lint
+
+      - name: Publishing on NPM
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
