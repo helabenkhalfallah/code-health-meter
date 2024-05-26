@@ -78,7 +78,7 @@ const getOverviewReport = (reports) => {
   ).toFixed(2);
 
   return {
-    summary: summary?.average,
+    summary,
     files: moduleFiles,
   };
 };

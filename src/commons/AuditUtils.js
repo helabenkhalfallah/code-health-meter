@@ -68,72 +68,34 @@ const groupReportsByFile = (reports) => reports?.reduce((acc, report) => ({
     ...(acc[report.file] || []),
     {
       title: report.title,
-      score: `${report.score || report.scorePercent || 0} ${report.scoreUnit || ''}`,
-      description: report.description,
+      score: `${Number((report.score || report.scorePercent || 0).toFixed(2))} ${report.scoreUnit || ''}`,
     },
   ],
 }), {});
 
 /**
- * Builds HTML data for a table.
- * @param {Object} reportsByFile - The reports grouped by file.
- * @returns {Object} - Returns an object with the table headers and rows.
- */
-const buildTableHtmlData = (reportsByFile) => {
-  const files = Object.keys(reportsByFile);
-  const columnsNames = reportsByFile[files[0]][0];
-
-  const tableHeaders = Object
-      .keys(columnsNames)
-      .map(key => `<th scope="col">${key}</th>`).join('\n');
-
-  const buildReportRow = (report) => Object
-      .keys(report)
-      .map(key => `<td>${report[key]}</td>`)
-      .join('\n');
-
-  const buildReportsRows = (fileReports) => fileReports
-      .map((report) => `
-      <tr>
-        ${buildReportRow(report)}
-      </tr>`).join('\n');
-
-  const tableRows = files
-      .map(file => `
-      <tr>
-        <td colspan="3">
-           <strong>${file}</strong>
-        </td>
-      </tr>
-      ${buildReportsRows(reportsByFile[file])}`)
-      .join('\n');
-
-  return({
-    tableHeaders,
-    tableRows,
-  });
-};
-
-/**
  * Formats the audit reports.
+ * @param {object} summary - The audit summary
  * @param {Array} auditReports - The audit reports to format.
  * @param {string} fileFormat - The format of the file.
  * @returns {string} - Returns a string with the formatted reports.
  */
-const formatReports = (auditReports, fileFormat) => {
+const formatReports = (summary, auditReports, fileFormat) => {
   const reportsByFile = groupReportsByFile(auditReports);
 
   if(fileFormat === 'json'){
-    return JSON.stringify(reportsByFile, null, 2);
+      return JSON.stringify({
+        summary,
+        reports: reportsByFile,
+      }, null, 2);
   }
 
   if(fileFormat === 'html'){
-    const {
-      tableHeaders,
-      tableRows,
-    } = buildTableHtmlData(reportsByFile);
+      const descriptions = [
+          ...new Set(auditReports.map((report) => report.description) || [])
+      ].map((description, index) => `${index + 1}) ${description}`) || [];
 
-    return buildHtmlComplexityReports(tableHeaders, tableRows);
+      return buildHtmlComplexityReports(summary, descriptions, reportsByFile);
   }
 
   return '';
@@ -141,13 +103,14 @@ const formatReports = (auditReports, fileFormat) => {
 
 /**
  * Writes the audit to a file.
+ * @param {object} summary - The audit summary
  * @param {Array} auditReports - The audit reports to write.
  * @param {Object} options - The options for the file.
  * @returns {boolean} - Returns true if the audit was written to the file, false otherwise.
  */
-const writeAuditToFile = (auditReports, options) => {
+const writeAuditToFile = (summary, auditReports, options) => {
   try{
-    if(!auditReports?.length){
+    if(!summary || !auditReports?.length){
       return false;
     }
 
@@ -162,7 +125,7 @@ const writeAuditToFile = (auditReports, options) => {
       fs.rmSync(outPutFileName);
     }
 
-    fs.writeFileSync(outPutFileName, formatReports(auditReports, fileFormat));
+    fs.writeFileSync(outPutFileName, formatReports(summary, auditReports, fileFormat));
 
     return true;
   } catch (error) {

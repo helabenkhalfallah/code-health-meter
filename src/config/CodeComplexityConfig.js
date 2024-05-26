@@ -136,12 +136,12 @@ const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
     type: 'code-complexity',
     category: 'cyclomatic',
     title: 'Cyclomatic Complexity',
-    description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).</br> 
-          The larger the cyclomatic number, the more execution paths there will be in the function, and the more difficult it will be to understand and test:</br>
-          - If the cyclomatic number is 1 to 10, then the code is structured, well written, highly testable, the cost and effort are less.</br>
-          - If the cyclomatic number is 10 to 20, the code is complex and moderately testable, and the cost and effort are medium.</br>
-          - If the cyclomatic number is 20 to 40, then the code is very complex and poorly testable, and the cost and effort are high.</br>
-          - If the cyclomatic number is > 40, it is not testable at all, and the cost and effort are very high.</br>
+    description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).<br /> 
+          The larger the cyclomatic number, the more execution paths there will be in the function, and the more difficult it will be to understand and test:<br />
+          - If the cyclomatic number is 1 to 10, then the code is structured, well written, highly testable, the cost and effort are less.<br />
+          - If the cyclomatic number is 10 to 20, the code is complex and moderately testable, and the cost and effort are medium.<br />
+          - If the cyclomatic number is 20 to 40, then the code is very complex and poorly testable, and the cost and effort are high.<br />
+          - If the cyclomatic number is > 40, it is not testable at all, and the cost and effort are very high.<br />
 
 The cyclomatic complexity report (or McCabe complexity report) presents the cyclomatic complexity (general measure of the solidity and reliability of a program) for the selected project entity.`,
     status: complexityStatus,
@@ -174,15 +174,15 @@ const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
     type: 'code-complexity',
     category: 'maintainability',
     title: 'Maintainability Index IM (%)',
-    description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.</br>
-    - 85 and above: good maintainability.</br>
-    - 65–85: moderate maintainability.</br>
-    - < 65: difficult to maintain.</br>
-    The maintainability index is calculated using the following formula:</br>
-    171 - 5.2 * ln(Halstead Volume) - 0.23 * (Cyclomatic Complexity) - 16.2 * ln(Number of statements)</br>
-    - V represents the Halstead Volume.</br>
-    - N represents the length of the program.</br>
-    - n represents the size of the dictionary.</br>
+    description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.<br />
+    - 85 and above: good maintainability.<br />
+    - 65–85: moderate maintainability.<br />
+    - < 65: difficult to maintain.<br />
+    The maintainability index is calculated using the following formula:<br />
+    171 - 5.2 * ln(Halstead Volume) - 0.23 * (Cyclomatic Complexity) - 16.2 * ln(Number of statements)<br />
+    - V represents the Halstead Volume.<br />
+    - N represents the length of the program.<br />
+    - n represents the size of the dictionary.<br />
        
 The maintainability index report presents the maintainability, McCabe and Halstead measures combined for the current project.`,
     status: maintainabilityStatus,
@@ -196,112 +196,149 @@ The maintainability index report presents the maintainability, McCabe and Halste
 };
 
 /**
+ * Builds HTML data for a table.
+ * @param {Object} reportsByFile - The reports grouped by file.
+ * @returns {Object} - Returns an object with the table headers and rows.
+ */
+const buildTableHtmlData = (reportsByFile) => {
+  const files = Object.keys(reportsByFile);
+
+  const columnsNames = reportsByFile[files[0]][0];
+
+  const tableHeaders = Object
+      .keys(columnsNames)
+      .map(key => `<th scope="col">${key}</th>`).join('\n');
+
+  const buildReportRow = (report) => Object
+      .keys(report)
+      .map(key => `<td>${report[key]}</td>`)
+      .join('\n');
+
+  const buildReportsRows = (fileReports) => fileReports
+      .map((report) => `
+      <tr>
+        ${buildReportRow(report)}
+      </tr>`).join('\n');
+
+  const tableRows = files
+      .map(file => `
+      <tr>
+        <td colspan="2" class="text-center bg-primary-subtle">
+           <strong>${file}</strong>
+        </td>
+      </tr>
+      ${buildReportsRows(reportsByFile[file])}`)
+      .join('\n');
+
+  return({
+    tableHeaders,
+    tableRows,
+  });
+};
+
+/**
  * Build Html Complexity Reports
- * @param {string} tableHeaders
- * @param {string} tableRows
- * @return {string}
- * */
-const buildHtmlComplexityReports = (tableHeaders, tableRows) => `
-<!DOCTYPE html>
+ * @param {object} summary - The audit summary
+ * @param {Array} descriptions - The audit report indicators descriptions
+ * @param {Object} reportsByFile - The reports grouped by file..
+ * @returns {string} - The html report
+ */
+const buildHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
+  const {
+    tableHeaders,
+    tableRows,
+  } = buildTableHtmlData(reportsByFile);
+
+  const {
+    average,
+  } = summary;
+
+  return `
+<!doctype html>
 <html lang="en">
-  <head>
-   <meta http-equiv="Content-Type" 
-      content="text/html; charset=utf-8">
-      <title>Audit Reports</title>
-        <style>
-          body {
-              margin-top: 2rem;
-              margin-bottom: 2rem;
-              font-family: sans-serif;
-          }
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audit Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body class="font-monospace">
+<h1 class="text-center mb-4 mt-4">Code Complexity Analysis</h1>
+<div class="container text-center w-50">
+    <article class="card">
+        <div class="card-body mb-2 mt-2">
+            <h2 class="card-title text-body-secondary mt-1">Global Status (Average)</h2>
+            <p class="card-text text-start fs-5 mt-4">
+                  <span class="text-primary-emphasis">
+                  <strong>Source lines of code (SLOC):</strong> ${average?.sloc || 0}
+                  </span>
+                <br />
+                <span class="text-primary-emphasis">
+                  <strong>Maintainability:</strong> ${average?.maintainability || 0}%
+                </span>
+            </p>
+            <div class="container text-end">
+                <button
+                        type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#helpMessage"
+                >
+                   More details about indicators
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
+                        <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
+                    </svg>
+                </button>
+            </div>            
+        </div>
+    </article>
+</div>
 
-          section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
+<!-- Modal -->
+<div class="modal fade" id="helpMessage" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="helpModalLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
+                        <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
+                    </svg>
+                    <strong>More details about the various indicators</strong>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container mb-2 mt-2">
+                   ${descriptions?.join('<br />') || ''}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-          h1 {
-              font-family: sans-serif;
-              font-size: 2rem;
-              text-align: center;
-          }
-
-          table {
-              width: 80%;
-              border-collapse: collapse;
-              border: 2px solid rgb(140 140 140);
-              font-size: 0.9rem;
-              letter-spacing: 1px;
-          }
-
-          caption {
-              caption-side: bottom;
-              padding: 10px;
-              font-weight: bold;
-          }
-
-          thead,
-          tfoot {
-              background-color: darkblue;
-              color: white;
-              text-transform: uppercase;
-          }
-
-          th,
-          td {
-              border: 1px solid rgb(160 160 160);
-              padding: 8px 10px;
-          }
-
-          td:last-of-type {
-              text-align: center;
-          }
-
-          tbody > tr:nth-of-type(even) {
-              background-color: rgb(237 238 242);
-          }
-
-          tfoot th {
-              text-align: right;
-          }
-
-          table td:nth-child(2) {
-             text-align: left;
-          }
-
-          table td:nth-child(3) {
-              text-align: left;
-          }
-
-          tfoot td {
-              font-weight: bold;
-          }
-
-          tbody>tr>td[colspan="3"] {
-              background-color: lightblue;
-              color: black;
-              text-align: center;
-          }
-        </style>
-  </head>
-  <body>
-   <h1>Code Complexity Analysis</h1>
-   <section>
-     <table id="audit-reports">
-        <thead>
-         <tr>
-           ${tableHeaders}
-         </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      </table>
-    </section>
-  </body>
- </html>
+<div class="container text-left mb-4 mt-4">
+  <div class="text-start">
+    <table class="table table-striped table-responsive caption-top table-bordered border-primary-subtle">
+      <caption>Analysis Details</caption>
+      <thead class="table-light text-uppercase">
+        <tr>
+            ${tableHeaders}
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        ${tableRows}
+      </tbody>
+    </table>
+  </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
     `;
+};
 
 const CodeComplexityConfig ={
   formatHalsteadReports,

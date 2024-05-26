@@ -64,14 +64,14 @@ const buildFilesComplexityReports = (files) => {
  * Start Code Complexity Audit
  * @param {string} directory
  * @param {object} options
- * @return {Promise<null|*[]>}
+ * @returns {Promise<{summary: {average: {sloc: number, maintainability: number}, total: {sloc: number, maintainability: number}}, auditReports: *[]}|{}>}
  */
 const startAudit = async (directory, options) => {
   try {
     AppLogger.info(`[CodeComplexityAuditor - startAudit] directory:  ${directory}`);
 
     if(!directory?.length){
-      return [];
+      return ({});
     }
 
     const {
@@ -87,8 +87,8 @@ const startAudit = async (directory, options) => {
     AppLogger.info(`[CodeComplexityAuditor - startAudit] files:  ${files?.length}`);
     AppLogger.info(`[CodeComplexityAuditor - startAudit] summary:  ${Object.keys(summary || {})?.length}`);
 
-    if (!summary?.maintainability || !files?.length) {
-      return [];
+    if (!files?.length) {
+      return ({});
     }
 
     const auditReports = [];
@@ -111,10 +111,13 @@ const startAudit = async (directory, options) => {
 
     auditReports.push(...(filesComplexityReports || []));
 
-    return auditReports;
+    return ({
+      summary,
+      auditReports,
+    });
   } catch (error) {
     AppLogger.info(`[CodeComplexityAuditor - startAudit] error:  ${error.message}`);
-    return null;
+    return ({});
   }
 };
 
