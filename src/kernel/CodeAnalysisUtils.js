@@ -194,9 +194,9 @@ const patternToFile = (pattern) => glob.sync(unixify(pattern));
  * @returns {Object} - Returns an object containing the overview report.
  */
 const inspect = ({
-                   srcDir,
-                   options,
-                 }) => {
+ srcDir,
+ options,
+}) => {
   try {
     printLog({
       srcDir,
