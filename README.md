@@ -25,8 +25,19 @@ Maintainability Index is a software metric which measures how maintainable (easy
 The maintainability index is calculated as a factored formula consisting of SLOC (Source Lines Of Code), Cyclomatic Complexity and Halstead volume. 
 It was originally developed by Oman & Hagemeister in the early 1990s. You can read more about it on [Wikipedia](https://learn.microsoft.com/en-us/visualstudio/code-quality/code-metrics-maintainability-index-range-and-meaning?view=vs-2022).
 
+## How to use ?
 
-## Getting Started
+1. Install the dependencies:
+    ```
+    npm install
+    ```
+
+2. Run the analysis on your project:
+    ```
+    npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    ```
+
+## How to contribute?
 
 1. Clone the repository:
     ```
@@ -41,7 +52,7 @@ It was originally developed by Oman & Hagemeister in the early 1990s. You can re
 
 3. Run the analysis on your codebase:
     ```
-    npm run analyze -- <your-source-directory>
+    npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
 
 ## Contributing

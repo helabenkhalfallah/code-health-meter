@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import path from 'path';
 import { parseArgs } from 'node:util';
 import CodeComplexityAuditor from './kernel/CodeComplexityAuditor.js';
