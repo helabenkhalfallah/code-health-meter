@@ -1,38 +1,34 @@
 # Code Health Meter
 
-CodeHealthMeter is a comprehensive tool designed to measure and monitor the health of a codebase. 
-It provides a **quantitative evaluation** of your code's maintainability, complexity, and size using a variety of established software metrics.
+CodeHealthMeter is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation** of your code's maintainability, complexity, and size using a variety of established software metrics.
 
-Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. 
-By applying formulas like the Halstead metrics and the Maintainability Index, we can obtain precise, objective measures of various aspects of the software’s quality.
+Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. By applying formulas like the Halstead metrics and the Maintainability Index, we can obtain precise, objective measures of various aspects of the software’s quality:
 
 ```js
-SLOC: This is a simple metric that counts the number of lines in the source code.
+// SLOC: This is a simple metric that counts the number of lines in the source code.
 
-Cyclomatic Complexity (M) = E − N + 2P
+// Cyclomatic Complexity (M) = E − N + 2P
 // where E is the number of edges in the flow graph, N is the number of nodes, and P is the number of connected components.
 
-Halstead Metrics:
-- The number of operators (`n1`) and operands (`n2`) in the program's source code
-- Program length (`N`): `N = n1 + n2`
-- Program vocabulary (`n`): `n = N1 + N2`
-- Volume (`V`): `V = N * log2(n)`
-- Difficulty (`D`): `D = (n1/2) * (N2/n2)`
-- Effort (`E`): `E = D * V`
-
-Maintainability Index (MI) = 171 - 5.2 * ln(V) - 0.23 * v(g) - 16.2 * ln(SLOC)
+// Halstead Metrics:
+// - The number of operators (`n1`) and operands (`n2`) in the program's source code
+// - Program length (`N`): `N = n1 + n2`
+// - Program vocabulary (`n`): `n = N1 + N2`
+// - Volume (`V`): `V = N * log2(n)`
+// - Difficulty (`D`): `D = (n1/2) * (N2/n2)`
+// - Effort (`E`): `E = D * V`
+// Maintainability Index (MI) = 171 - 5.2 * ln(V) - 0.23 * v(g) - 16.2 * ln(SLOC)
 ```
 
-These metrics, among others, allow us to quantify attributes of the software that might otherwise be difficult to measure. 
-This quantitative approach provides a more precise and objective assessment of software quality compared to more subjective methods.
+These metrics, among others, allow us to quantify attributes of the software that might otherwise be difficult to measure. This quantitative approach provides a more precise and objective assessment of software quality compared to more subjective methods.
 
 Subjective methods for evaluating software quality often involve human judgment and interpretation. Here are a few examples:
-- Peer Review: This involves having one or more colleagues review your code. They can provide feedback on various aspects such as coding style, logic, and potential bugs. However, the feedback can vary greatly depending on the reviewer’s experience, knowledge, and personal preferences.
-- User Feedback: Collecting feedback from users is another subjective method. Users can provide valuable insights into the usability and functionality of the software. However, user feedback can be highly subjective and may not always reflect the technical quality of the software.
-- Heuristic Evaluation: This involves having a small set of evaluators examine the user interface against a list of heuristic principles (e.g., Nielsen’s Heuristics). It’s subjective as it heavily relies on the expertise of the evaluators.
-- Expert Opinion: An expert in the field provides their assessment of the software quality. This can be beneficial due to the expert’s deep knowledge, but again, it’s subjective and can be influenced by personal bias.
+- **Peer Review**: This involves having one or more colleagues review your code. They can provide feedback on various aspects such as coding style, logic, and potential bugs. However, the feedback can vary greatly depending on the reviewer’s experience, knowledge, and personal preferences.
+- **User Feedback**: Collecting feedback from users is another subjective method. Users can provide valuable insights into the usability and functionality of the software. However, user feedback can be highly subjective and may not always reflect the technical quality of the software.
+- **Heuristic Evaluation**: This involves having a small set of evaluators examine the user interface against a list of heuristic principles (e.g., Nielsen’s Heuristics). It’s subjective as it heavily relies on the expertise of the evaluators.
+- **Expert Opinion**: An expert in the field provides their assessment of the software quality. This can be beneficial due to the expert’s deep knowledge, but again, it’s subjective and can be influenced by personal bias.
 
-While these methods can provide valuable insights, they lack the objectivity and precision of quantitative methods like Halstead metrics or cyclomatic complexity. Therefore, a combination of both subjective and objective methods is often used in practice for a comprehensive evaluation of software quality. 
+While these methods can provide valuable insights, they lack the objectivity and precision of quantitative methods like Halstead metrics or cyclomatic complexity. Therefore, a combination of both subjective and objective methods is often used in practice for a comprehensive evaluation of software quality.
 
 ## Key Features
 
