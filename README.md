@@ -15,68 +15,94 @@
 
 > Halstead complexity measurement was developed to measure a program module's complexity directly from source code, with emphasis on computational complexity. The measures were developed by the late Maurice Halstead as a means of determining a quantitative measure of complexity directly from the operators and operands in the module. [IBM DevOps Test Embedded](https://www.ibm.com/docs/en/devops-test-embedded/9.0.0?topic=metrics-halstead).
 
-Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. By applying formulas like the Halstead metrics and the Maintainability Index, we can obtain precise, objective measures of various aspects of the software’s quality:
+Quantitative software quality analysis involves a mathematical approach to analyzing the source code and architecture of a software system. 
+By applying formulas like the **Halstead metrics and the Maintainability Index**, we can obtain precise, objective measures of various aspects of the software’s quality:
 
-```js
-// SLOC: This is a simple metric that counts the number of lines in the source code.
+---
 
-// Cyclomatic Complexity (M) = E − N + 2P
-// where E is the number of edges in the flow graph, N is the number of nodes, and P is the number of connected components.
+1. **Operators and Operands**:
+   - **n1**: Number of distinct operators.
+   - **n2**: Number of distinct operands.
+   - **N1**: Total number of operators.
+   - **N2**: Total number of operands.
 
-// Halstead Metrics:
-// - The number of operators (`n1`) and operands (`n2`) in the program's source code
-// - Program length (`N`): `N = n1 + n2`
-// - Program vocabulary (`n`): `n = N1 + N2`
-// - Volume (`V`): `V = N * log2(n)`
-// - Difficulty (`D`): `D = (n1/2) * (N2/n2)`
-// - Effort (`E`): `E = D * V`
-// Maintainability Index (MI) = 171 - 5.2 * ln(V) - 0.23 * v(g) - 16.2 * ln(SLOC)
+2. **Derived Metrics**:
+   - **Vocabulary (n)**: \( n = n1 + n2 \)
+   - **Program Length (N)**: \( N = N1 + N2 \)
+   - **Calculated Program Length (N')**: \( N' = n1 \log_2 n1 + n2 \log_2 n2 \)
+   - **Volume (V)**: \( V = N \log_2 n \)
+   - **Difficulty (D)**: \( D = \frac{n1}{2} \times \frac{N2}{n2} \)
+   - **Effort (E)**: \( E = V \times D \)
+   - **Time to Implement (T)**: \( T = \frac{E}{18} \) (in seconds)
+   - **Number of Delivered Bugs (B)**: \( B = \frac{E^{2/3}}{3000} \)
+
+**Interpretation**:
+- **Volume (V)**: Indicates the size of the implementation. Larger volumes suggest more complex code.
+- **Difficulty (D)**: Measures the difficulty of writing or understanding the code. Higher values indicate more complex logic.
+- **Effort (E)**: Represents the mental effort required. Higher values suggest more time-consuming code.
+- **Number of Delivered Bugs (B)**: Estimates the number of errors. Higher values indicate a higher likelihood of bugs.
+
+3. **Cyclomatic Complexity (CC)** is:
+
+```
+CC = E - N + 2P
 ```
 
-These metrics, among others, allow us to quantify attributes of the software that might otherwise be difficult to measure. This quantitative approach provides a more precise and objective assessment of software quality compared to more subjective methods.
+**where**:
+- \( E \) is the number of edges in the control flow graph.
+- \( N \) is the number of nodes in the control flow graph.
+- \( P \) is the number of connected components (usually 1 for a single program).
 
-Subjective methods for evaluating software quality often involve human judgment and interpretation. Here are a few examples:
+**Interpretation**:
+- A lower Cyclomatic Complexity indicates simpler, more understandable code.
+- Typically, a CC value of 10 or less is considered manageable, while higher values indicate more complex and potentially error-prone code.
+
+4. **Maintainability Index (MI)** is:
+
+```
+MI= 171 − 5.2×log(V) − 0.23×CC −16.2×log(SLOC) + 50×sin(2.46×comments_ratio)
+```
+
+**where**:
+- \( V \) is the Halstead Volume
+- \( CC \) is the Cyclomatic Complexity
+- \( SLOC \) is the Source Lines of Code
+- \( comments\_ratio \) is the ratio of comment lines to the total lines of code
+
+**Interpretation**:
+- A higher MI value indicates more maintainable code.
+- Typically, an MI value over 85 is considered good, between 65 and 85 is moderate, and below 65 is poor.
+
+When analyzing a codebase, the tool might output metrics like this:
+- **Vocabulary (n)**: 40
+- **Program Length (N)**: 300
+- **Volume (V)**: 1500
+- **Difficulty (D)**: 30
+- **Effort (E)**: 45000
+- **Time to Implement (T)**: 2500 seconds
+- **Number of Delivered Bugs (B)**: 15
+
+From this, developers and managers can infer that the code is complex and may require significant effort to maintain or extend. 
+Refactoring efforts can be prioritized on modules with the highest metrics to improve maintainability and reduce potential bugs.
+
+Another example:
+- **SLOC**: 5000
+- **Cyclomatic Complexity (CC)**: 20
+- **Maintainability Index (MI)**: 75
+
+From this, developers and managers can infer that the codebase is moderately maintainable but has some areas of high complexity that may need attention to improve overall maintainability and reduce potential bugs.
+
+---
+
+This quantitative approach provides a more precise and objective assessment of software quality compared to more subjective methods:
 - **Peer Review**: This involves having one or more colleagues review your code. They can provide feedback on various aspects such as coding style, logic, and potential bugs. However, the feedback can vary greatly depending on the reviewer’s experience, knowledge, and personal preferences.
 - **User Feedback**: Collecting feedback from users is another subjective method. Users can provide valuable insights into the usability and functionality of the software. However, user feedback can be highly subjective and may not always reflect the technical quality of the software.
 - **Heuristic Evaluation**: This involves having a small set of evaluators examine the user interface against a list of heuristic principles (e.g., Nielsen’s Heuristics). It’s subjective as it heavily relies on the expertise of the evaluators.
 - **Expert Opinion**: An expert in the field provides their assessment of the software quality. This can be beneficial due to the expert’s deep knowledge, but again, it’s subjective and can be influenced by personal bias.
 
-While these methods can provide valuable insights, they lack the objectivity and precision of quantitative methods like Halstead metrics or cyclomatic complexity. Therefore, a combination of both subjective and objective methods is often used in practice for a comprehensive evaluation of software quality.
+While these methods can provide valuable insights, they lack the objectivity and precision of quantitative methods like Halstead metrics or cyclomatic complexity. 
 
----
-
-## Key Features
-
-- **Maintainability Index**: This metric provides a single score that reflects the maintainability of your code. It takes into account factors such as cyclomatic complexity, Halstead volume, and lines of code.
-
-- **Cyclomatic Complexity**: This metric measures the number of linearly independent paths through a program's source code. It is a quantitative measure of the number of logical decisions a program can make, providing insights into its complexity.
-
-- **Halstead Metrics**: Developed by Maurice Howard Halstead, these metrics provide insights into the complexity and understandability of your code. They measure aspects such as the number of unique operators and operands, program length, and program volume.
-
-- **Source Lines of Code (SLOC)**: SLOC is a simple yet effective metric for estimating the size of a software program. It counts the number of lines in the source code, providing a measure of the program's length.
-
-- **Report Generation**: CodeHealthMeter generates detailed reports in both HTML and JSON formats. These reports provide a visual and structured view of the metrics, making it easy to understand the health of your codebase at a glance.
-
-By leveraging these metrics, CodeHealthMeter allows you to gain a deeper understanding of your code's health. 
-It helps you identify potential areas for improvement, making it an invaluable tool for maintaining high-quality, efficient, and maintainable code.
-
----
-
-## More information about metrics
-
-- **Cyclomatic Complexity**: 
-Cyclomatic complexity is a software metric used to indicate the complexity of a program. 
-It is a quantitative measure of the number of linearly independent paths through a program’s source code. You can read more about it on [Wikipedia](https://en.wikipedia.org/wiki/Cyclomatic_complexity).
-
-- **Halstead Complexity**:
-Halstead complexity measures are software metrics introduced by Maurice Howard Halstead in 1977 as part of his treatise on establishing an empirical science of software development. 
-Halstead made the observation that metrics of the software should reflect the implementation or expression of algorithms in different languages, but be independent of their execution on a specific platform. 
-You can read more about it on [Wikipedia](https://en.wikipedia.org/wiki/Halstead_complexity_measures).
-
-- **Maintainability Index**: 
-Maintainability Index is a software metric which measures how maintainable (easy to support and change) the source code is. 
-The maintainability index is calculated as a factored formula consisting of SLOC (Source Lines Of Code), Cyclomatic Complexity and Halstead volume. 
-It was originally developed by Oman & Hagemeister in the early 1990s. You can read more about it on [Wikipedia](https://learn.microsoft.com/en-us/visualstudio/code-quality/code-metrics-maintainability-index-range-and-meaning?view=vs-2022).
+**Therefore, a combination of both subjective and objective methods is often used in practice for a comprehensive evaluation of software quality.**
 
 ---
 
