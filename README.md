@@ -42,6 +42,96 @@ Or using `npx`:
    npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
    ```
 
+Example of a JSON report:
+```
+{
+  "summary": {
+    "total": {
+      "sloc": 5324180,
+      "maintainability": 3650140.4030000097
+    },
+    "average": {
+      "sloc": 107,
+      "maintainability": "73.54"
+    }
+  },
+  "reports": {
+    "src/XX/FileName.ts": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "49.12 %"
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "11 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "483 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "3236.31 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "26.91 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "87086.22 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "1.08 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "4838.12 s"
+      }
+    ],
+    "FileName.ts": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "49.65 %"
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "20 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "540 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "3633.08 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "34.09 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "123866.56 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "1.21 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "6881.48 s"
+      }
+    ],
+    ...   
+```
+
+Example of an HTML report:
+![HTML_REPORT_1](HTML_REPORT_1.png)
+
+![HTML_REPORT_2](HTML_REPORT_2.png)
+
 ## Contributing
 
 Contributions are welcome! Please read the contributing guidelines before getting started.
@@ -60,6 +150,9 @@ Contributions are welcome! Please read the contributing guidelines before gettin
 3. Run the analysis on your codebase:
     ```
     npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    ```
+    ```
+    npxscan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
     ```
    
 ## License
