@@ -25,15 +25,14 @@ By applying formulas like the **Halstead metrics and the Maintainability Index**
    - **N2**: Total number of operands.
 
 2. **Derived Metrics**:
-   - **Vocabulary (n)**: \( n = n1 + n2 \)
-   - **Program Length (N)**: \( N = N1 + N2 \)
-   - **Calculated Program Length (N')**: \( N' = n1 \log_2 n1 + n2 \log_2 n2 \)
-   - **Volume (V)**: \( V = N \log_2 n \)
-   - **Difficulty (D)**: \( D = \frac{n1}{2} \times \frac{N2}{n2} \)
-   - **Effort (E)**: \( E = V \times D \)
-   - **Time to Implement (T)**: \( T = \frac{E}{18} \) (in seconds)
-   - **Number of Delivered Bugs (B)**: \( B = \frac{E^{2/3}}{3000} \)
-
+   - **Vocabulary (n)**: n = n1 + n2
+   - **Program Length (N)**: N = N1 + N2
+   - **Volume (V)**: V = N * log2(n)
+   - **Difficulty (D)**: D = (n1/2) * (N2/n2) 
+   - **Effort (E)**:  E = V * D
+   - **Time to Implement (T)**: 	T = E / k
+   - **Number of Delivered Bugs (B)**: B = V / 3000
+  
 **Interpretation**:
 - **Volume (V)**: Indicates the size of the implementation. Larger volumes suggest more complex code.
 - **Difficulty (D)**: Measures the difficulty of writing or understanding the code. Higher values indicate more complex logic.
