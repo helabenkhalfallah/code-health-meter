@@ -251,6 +251,13 @@ const buildHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
 
   const {
     average,
+    goodMaintainabilityTotal,
+    moderateMaintainabilityTotal,
+    badMaintainabilityTotal,
+    goodCyclomaticTotal,
+    moderateCyclomaticTotal,
+    badCyclomaticTotal,
+    veryBadCyclomaticTotal,
   } = summary;
 
   return `
@@ -261,37 +268,108 @@ const buildHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Audit Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: "Gill Sans", sans-serif;
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        span {
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
-<body class="font-monospace">
+<body>
 <h1 class="text-center mb-4 mt-4">Code Complexity Analysis</h1>
-<div class="container text-center w-50">
-    <article class="card">
-        <div class="card-body mb-2 mt-2">
-            <h2 class="card-title text-body-secondary mt-1">Global Status (Average)</h2>
-            <p class="card-text text-start fs-5 mt-4">
-                  <span class="text-primary-emphasis">
-                  <strong>Source lines of code (SLOC):</strong> ${average?.sloc || 0}
-                  </span>
-                <br />
-                <span class="text-primary-emphasis">
-                  <strong>Maintainability:</strong> ${average?.maintainability || 0}%
-                </span>
-            </p>
-            <div class="container text-end">
-                <button
-                        type="button"
-                        class="btn btn-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#helpMessage"
-                >
-                   More details about indicators
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
-                        <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
-                    </svg>
-                </button>
-            </div>            
+
+<div class="container text-end mt-3 mb-3">
+    <button
+            type="button"
+            class="btn btn-outline-danger border-0"
+            data-bs-toggle="modal"
+            data-bs-target="#helpMessage"
+    >
+        More details about indicators
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
+            <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
+        </svg>
+    </button>
+</div>
+
+<div class="container text-center">
+    <div class="row gx-2">
+
+        <div class="col">
+            <article class="card">
+                <div class="card-body mb-2 mt-2">
+                    <h2 class="card-title text-body-secondary mt-1">Global Status</h2>
+                    <p class="card-text text-start mt-4">
+                        <span class="text-primary-emphasis">
+                          Source lines of code (SLOC): <strong>${average?.sloc || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                         Maintainability: <strong>${average?.maintainability || 0}%</strong>
+                        </span>
+                    </p>
+                </div>
+            </article>
         </div>
-    </article>
+
+        <div class="col">
+            <article class="card">
+                <div class="card-body mb-2 mt-2">
+                    <h2 class="card-title text-body-secondary mt-1">Maintainability Summary</h2>
+                    <p class="card-text text-start mt-4">
+                        <span class="text-primary-emphasis">
+                         Number of files with good maintainability index (>=85 %): <strong>${goodMaintainabilityTotal || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                         Number of files with moderate maintainability index (65–85 %): <strong>${moderateMaintainabilityTotal || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                         Number of files with bad maintainability index (<65 %): <strong>${badMaintainabilityTotal || 0}</strong>
+                        </span>
+                    </p>
+                </div>
+            </article>
+        </div>
+
+        <div class="col">
+            <article class="card">
+                <div class="card-body mb-2 mt-2">
+                    <h2 class="card-title text-body-secondary mt-1">Cyclomatic Complexity Summary</h2>
+                    <p class="card-text text-start mt-4">
+                        <span class="text-primary-emphasis">
+                          Number of files with good Cyclomatic Number (1 to 10): <strong>${goodCyclomaticTotal || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                         Number of files with moderate Cyclomatic Number (10 to 20): <strong>${moderateCyclomaticTotal || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                          Number of files with bad Cyclomatic Number (20 to 40): <strong>${badCyclomaticTotal || 0}</strong>
+                        </span>
+                        <br />
+                        <span class="text-primary-emphasis">
+                          Number of files with very bad Cyclomatic Number (> 40): <strong>${veryBadCyclomaticTotal || 0}</strong>
+                        </span>
+                    </p>
+                </div>
+            </article>
+        </div>
+    </div>
 </div>
 
 <!-- Modal -->
