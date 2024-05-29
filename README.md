@@ -107,7 +107,7 @@ While these methods can provide valuable insights, they lack the objectivity and
 
 1. Install the dependencies:
     ```
-    npm install
+    npm i -D code-health-meter
     ```
 
 2. Run the analysis on your project:
