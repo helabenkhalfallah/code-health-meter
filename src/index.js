@@ -1,20 +1,16 @@
 #!/usr/bin/env node
 
-import path from 'path';
 import { parseArgs } from 'node:util';
-import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
-import CodeComplexityConfig from './kernel/complexity/CodeComplexityConfig.js';
 import AppLogger from './commons/AppLogger.js';
-import AuditUtils from './commons/AuditUtils.js';
+import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
+import CodeCouplingAuditor from './kernel/coupling/CodeCouplingAuditor.js';
+import CodeComplexityUtils from './kernel/complexity/CodeComplexityUtils.js';
+import CodeCouplingUtils from './kernel/coupling/CodeCouplingUtils.js';
 
-const{
-  writeAuditToFile
-} = AuditUtils;
-
-const {
-  formatHtmlComplexityReports
-} = CodeComplexityConfig;
-
+/**
+ * Parses command line arguments.
+ * @type {Object}
+ */
 const args = parseArgs({
   options: {
     srcDir: {
@@ -23,48 +19,70 @@ const args = parseArgs({
     outputDir: {
       type: 'string',
     },
-    outputFile: {
-      type: 'string',
-    },
     format: {
       type: 'string',
     },
   },
 });
 
+/**
+ * Destructures the values from the parsed arguments.
+ * @type {Object}
+ */
 const {
   srcDir,
   outputDir,
-  outputFile,
   format,
 } = args?.values || {};
 
-if(!srcDir){
-  AppLogger.info('srcDir is require and must be a string (npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html")');
+/**
+ * Checks if the source directory and output directory are provided.
+ */
+if(!srcDir || !outputDir){
+  AppLogger.info('srcDir is require and must be a string (npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html")');
   process.exit(-1);
 }
 
-const directory  = srcDir;
+/**
+ * Starts the code complexity audit.
+ * @type {Object}
+ */
+const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(
+  srcDir,
+  {
+    exclude: null,
+    noempty: true,
+    quiet: true,
+    title: srcDir,
+  }
+);
 
-const inputOptions = {
-  exclude: null,
-  noempty: true,
-  quiet: true,
-  title: directory,
-};
+/**
+ * Starts the code coupling audit.
+ * https://github.com/pahen/madge?tab=readme-ov-file#configuration
+ * @type {Object}
+ */
+const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir, {});
 
-const outPutOptions = {
-  fileName: path.join(outputDir, outputFile),
-  fileFormat: format, // html or json
-  htmlReportFormatter: formatHtmlComplexityReports,
-};
+/**
+ * Writes the audit result to files.
+ */
+CodeComplexityUtils
+  .writeCodeComplexityAuditToFile({
+    codeComplexityOptions: {
+      outputDir,
+      fileFormat: format, // html or json
+    },
+    codeComplexityAnalysisResult,
+  });
 
-const {
-  summary,
-  auditReports,
-} = await CodeComplexityAuditor.startAudit(directory, inputOptions);
+CodeCouplingUtils
+  .writeCodeCouplingAuditToFile({
+    codeCouplingOptions: {
+      outputDir,
+      fileFormat: format, // html or json
+    },
+    codeCouplingAnalysisResult,
+  });
 
-AppLogger.info(`[AuditorWorker] summary:  ${Object.keys(summary || {}).length}`);
-AppLogger.info(`[AuditorWorker] auditReports:  ${auditReports?.length}`);
 
-writeAuditToFile(summary, auditReports, outPutOptions);

@@ -239,11 +239,11 @@ const buildTableHtmlData = (reportsByFile) => {
 /**
  * Format Html Complexity Reports
  * @param {object} summary - The audit summary
- * @param {Array} descriptions - The audit report indicators descriptions
+ * @param {Array} helpMessages - Help messages about the audit report indicators
  * @param {Object} reportsByFile - The reports grouped by file
  * @returns {string} - The html report
  */
-const formatHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
+const formatCodeComplexityHtmlReport = (summary, helpMessages, reportsByFile) => {
   const {
     tableHeaders,
     tableRows,
@@ -275,15 +275,19 @@ const formatHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
         }
 
         h1 {
-            font-size: 2rem;
+          font-size: 2rem;
         }
 
         h2 {
-            font-size: 1.5rem;
+           font-size: 1.5rem;
         }
 
         span {
-            font-size: 0.9rem;
+          font-size: 0.9rem;
+        }
+        
+        .modal-body{
+           font-size: 1.1rem;
         }
     </style>
 </head>
@@ -387,7 +391,7 @@ const formatHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
             </div>
             <div class="modal-body">
                 <div class="container mb-2 mt-2">
-                   ${descriptions?.join('<br />') || ''}
+                   ${helpMessages?.join('<br /><br />') || ''}
                 </div>
             </div>
             <div class="modal-footer">
@@ -422,7 +426,7 @@ const CodeComplexityConfig = {
   formatHalsteadReports,
   formatMaintainabilityIndexReport,
   formatCyclomaticComplexityReport,
-  formatHtmlComplexityReports,
+  formatCodeComplexityHtmlReport,
 };
 
 export default CodeComplexityConfig;

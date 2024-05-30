@@ -5,6 +5,11 @@ import lodash from 'lodash';
 import glob from 'globby';
 import unixify from 'unixify';
 import AppLogger from '../../commons/AppLogger.js';
+import CodeComplexityConfig from './CodeComplexityConfig.js';
+
+const {
+  formatCodeComplexityHtmlReport,
+} = CodeComplexityConfig;
 
 /**
  * Parser options for the escomplex module analyzer.
@@ -365,6 +370,122 @@ const inspect = ({
   }
 };
 
+
+/**
+ * Groups reports by file.
+ * @param {Array} reports - The reports to group.
+ * @returns {Object} - Returns an object with the reports grouped by file.
+ */
+const groupReportsByFile = (reports) => reports?.reduce((acc, report) => ({
+  ...acc,
+  [report.file]: [
+    ...(acc[report.file] || []),
+    {
+      title: report.title,
+      score: `${Number((report.score || report.scorePercent || 0).toFixed(2))} ${report.scoreUnit || ''}`,
+    },
+  ],
+}), {});
+
+/**
+ * Formats the audit reports.
+ * @param {object} summary - The audit summary
+ * @param {Array} auditReports - The audit reports to format.
+ * @param {string} fileFormat - The format of the file.
+ * @returns {string} - Returns a string with the formatted reports.
+ */
+const formatCodeComplexityAuditReports = ({
+  summary,
+  auditReports,
+  fileFormat,
+}) => {
+  const reportsByFile = groupReportsByFile(auditReports);
+
+  if(fileFormat === 'json'){
+    return JSON.stringify({
+      summary,
+      reports: reportsByFile,
+    }, null, 2);
+  }
+
+  if(fileFormat === 'html'){
+    const helpMessages = [
+      ...new Set(auditReports.map((report) => report.description) || [])
+    ].map((description, index) => `${index + 1}) ${description}`) || [];
+    return formatCodeComplexityHtmlReport(summary, helpMessages, reportsByFile);
+  }
+
+  return '';
+};
+
+/**
+ * Writes the result of a code complexity analysis to a file.
+ *
+ * @param {Object} codeComplexityOptions - The options for the code complexity analysis.
+ * @param {string} codeComplexityOptions.outputDir - The output directory to write the report to.
+ * @param {string} codeComplexityOptions.fileFormat - The format of the file to write the report to.
+ * @param {Function} codeComplexityOptions.reportsFormatter - The formatter function for the HTML report.
+ * @param {Object} codeComplexityAnalysisResult - The result of the code complexity analysis.
+ * @param {Object} codeComplexityAnalysisResult.summary - The summary of the code complexity analysis.
+ * @param {Object[]} codeComplexityAnalysisResult.auditReports - The audit reports from the code complexity analysis.
+ * @returns {boolean} Returns true if the file was written successfully, false otherwise.
+ * @throws {Error} If an error occurs while writing the file.
+ */
+const writeCodeComplexityAuditToFile = ({
+  codeComplexityOptions,
+  codeComplexityAnalysisResult,
+}) => {
+  try{
+    const {
+      outputDir,
+      fileFormat,
+    } = codeComplexityOptions || {};
+
+    AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] outputDir:  ${outputDir}`);
+    AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] fileFormat:  ${fileFormat}`);
+
+    if(!outputDir?.length){
+      return false;
+    }
+
+    const {
+      summary,
+      auditReports,
+    } = codeComplexityAnalysisResult || {};
+
+    const codeComplexityAuditOutputFileName = `CodeComplexityReport.${fileFormat || 'json'}`;
+    AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] codeComplexityAuditOutputFileName:  ${codeComplexityAuditOutputFileName}`);
+
+    const codeComplexityAuditOutputFile = path.join(outputDir, codeComplexityAuditOutputFileName);
+    AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] codeComplexityAuditOutputFile:  ${codeComplexityAuditOutputFile}`);
+
+    if(fs.existsSync(codeComplexityAuditOutputFile)){
+      fs.rmSync(codeComplexityAuditOutputFile);
+    } else {
+      fs.mkdirSync(outputDir, {
+        recursive: true
+      });
+    }
+
+    const formattedCodeComplexityAuditReports = formatCodeComplexityAuditReports({
+      summary,
+      auditReports,
+      fileFormat,
+    });
+
+    if(!formattedCodeComplexityAuditReports?.length){
+      return false;
+    }
+
+    fs.writeFileSync(codeComplexityAuditOutputFile, formattedCodeComplexityAuditReports);
+
+    return true;
+  } catch (error) {
+    AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] error:  ${error.message}`);
+    return false;
+  }
+};
+
 /**
  * The CodeComplexityUtils object.
  * @typedef {Object} CodeComplexityUtils
@@ -372,6 +493,7 @@ const inspect = ({
  */
 const CodeComplexityUtils = {
   inspect,
+  writeCodeComplexityAuditToFile,
 };
 
 export default CodeComplexityUtils;

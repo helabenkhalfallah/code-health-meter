@@ -9,7 +9,7 @@
 
 ## Presentation
 
-**CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation (computational complexity)** of your code's maintainability, complexity, and size using a variety of established software metrics.
+**CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation (computational complexity)** of your code's maintainability, coupling, stability, complexity, and size using a variety of established software metrics.
 
 > Halstead complexity measurement was developed to measure a program module's complexity directly from source code, with emphasis on computational complexity. The measures were developed by the late Maurice Halstead as a means of determining a quantitative measure of complexity directly from the operators and operands in the module. [IBM DevOps Test Embedded](https://www.ibm.com/docs/en/devops-test-embedded/9.0.0?topic=metrics-halstead).
 
@@ -89,9 +89,26 @@ Another example:
 
 From this, developers and managers can infer that the codebase is moderately maintainable but has some areas of high complexity that may need attention to improve overall maintainability and reduce potential bugs.
 
+5. **Coupling and Instability**:
+
+- <strong>Afferent Coupling (Ca):</strong> This refers to the number of external modules that depend on the given module.
+  It’s a measure of how much responsibility a module has. <br />
+  <i>For instance, if you have a module A that provides utility functions used by modules B, C, and D, then the Afferent Coupling of module A is 3 (since three modules are depending on it).</i><br />
+  <br />
+- <strong>Efferent Coupling (Ce):</strong> This is the opposite of Afferent Coupling.
+  It measures how many other modules a given module depends on.<br />
+  <i>For example, if module A uses utility functions from modules B, C, and D, then the Efferent Coupling of module A is 3 (since it depends on three other modules).</i><br />
+  <br />
+- <strong>Instability Index:</strong> This is a measure of the module’s resilience to change, calculated as I = Ce / (Ca + Ce). <br />
+  The range for this metric is 0 to 1. A value of 0 indicates a completely stable module (highly depended upon, but doesn’t depend on others), and a value of 1 indicates a completely unstable module (depends on many others, but isn’t depended upon). <br />
+  <i>For instance, if module A has an Efferent Coupling of 3 and an Afferent Coupling of 1, its Instability Index would be I = 3 / (1 + 3) = 0.75, indicating it’s more unstable than stable.</i><br />
+  <br />
+  These metrics are useful in software design for understanding dependencies and the impact of potential changes. <br />
+  They can help identify modules that might be problematic to maintain or evolve due to high coupling or instability.<br />
+
 ---
 
-This quantitative approach provides a more precise and objective assessment of software quality compared to more subjective methods:
+This quantitative and mathematical approach provides a more precise and objective assessment of software quality compared to more subjective methods:
 - **Peer Review**: This involves having one or more colleagues review your code. They can provide feedback on various aspects such as coding style, logic, and potential bugs. However, the feedback can vary greatly depending on the reviewer’s experience, knowledge, and personal preferences.
 - **User Feedback**: Collecting feedback from users is another subjective method. Users can provide valuable insights into the usability and functionality of the software. However, user feedback can be highly subjective and may not always reflect the technical quality of the software.
 - **Heuristic Evaluation**: This involves having a small set of evaluators examine the user interface against a list of heuristic principles (e.g., Nielsen’s Heuristics). It’s subjective as it heavily relies on the expertise of the evaluators.
@@ -112,75 +129,23 @@ While these methods can provide valuable insights, they lack the objectivity and
 
 2. Run the analysis on your project:
     ```
-    npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
     ```
 
 Or using `npx`:
    ```
-   npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+   npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
    ```
 
-Example of a JSON report:
-```
-{
-  "summary": {
-    "total": {
-      "sloc": 5324180,
-      "maintainability": 3650140.4030000097
-    },
-    "average": {
-      "sloc": 107,
-      "maintainability": "73.54"
-    }
-  },
-  "reports": {
-    "src/XX/FileName.ts": [
-      {
-        "title": "Maintainability Index IM (%)",
-        "score": "49.12 %"
-      },
-      {
-        "title": "Cyclomatic Complexity",
-        "score": "11 "
-      },
-      {
-        "title": "Program Length (N)",
-        "score": "483 "
-      },
-      {
-        "title": "Program Volume (V)",
-        "score": "3236.31 bit"
-      },
-      {
-        "title": "Difficulty Level (D)",
-        "score": "26.91 "
-      },
-      {
-        "title": "Implementation Effort (E) or Understanding",
-        "score": "87086.22 bit"
-      },
-      {
-        "title": "Number of estimated bugs in a module or function (B)",
-        "score": "1.08 "
-      },
-      {
-        "title": "Time (T) to implement or understand the program",
-        "score": "4838.12 s"
-      }
-    ],
-    "FileName.ts": [
-      {
-        "title": "Maintainability Index IM (%)",
-        "score": "49.65 %"
-      },
-      {
-    ...   
-```
+**Example of an HTML report:**
 
-Example of an HTML report:
 ![HTML_REPORT_1](HTML_REPORT_1.png)
 
 ![HTML_REPORT_2](HTML_REPORT_2.png)
+
+![HTML_REPORT_3](HTML_REPORT_3.png)
+
+![HTML_REPORT_4](HTML_REPORT_4.png)
 
 ---
 
@@ -201,10 +166,10 @@ Contributions are welcome! Please read the contributing guidelines before gettin
 
 3. To locally test the analysis you can run:
     ```
-    npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
     ```
     ```
-    npx scan --srcDir "../../my-path" --outputDir "../../my-output-path" --outputFile "OutputFileName" --format "json or html"
+    npx scan --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
     ```
 
 ---
