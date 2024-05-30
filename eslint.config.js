@@ -18,6 +18,13 @@ export default [
     rules: {
       quotes: ["error", "single"],
       semi: ["error", "always"],
+      indent: [
+        2,
+        2,
+        {
+          SwitchCase: 1,
+        },
+      ],
     }
   }
 ];

@@ -2,7 +2,8 @@
 
 import path from 'path';
 import { parseArgs } from 'node:util';
-import CodeComplexityAuditor from './kernel/CodeComplexityAuditor.js';
+import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
+import CodeComplexityConfig from './kernel/complexity/CodeComplexityConfig.js';
 import AppLogger from './commons/AppLogger.js';
 import AuditUtils from './commons/AuditUtils.js';
 
@@ -10,21 +11,25 @@ const{
   writeAuditToFile
 } = AuditUtils;
 
+const {
+  formatHtmlComplexityReports
+} = CodeComplexityConfig;
+
 const args = parseArgs({
-    options: {
-        srcDir: {
-            type: 'string',
-        },
-        outputDir: {
-            type: 'string',
-        },
-        outputFile: {
-            type: 'string',
-        },
-        format: {
-            type: 'string',
-        },
+  options: {
+    srcDir: {
+      type: 'string',
     },
+    outputDir: {
+      type: 'string',
+    },
+    outputFile: {
+      type: 'string',
+    },
+    format: {
+      type: 'string',
+    },
+  },
 });
 
 const {
@@ -42,20 +47,21 @@ if(!srcDir){
 const directory  = srcDir;
 
 const inputOptions = {
-    exclude: null,
-    noempty: true,
-    quiet: true,
-    title: directory,
+  exclude: null,
+  noempty: true,
+  quiet: true,
+  title: directory,
 };
 
 const outPutOptions = {
-    fileName: path.join(outputDir, outputFile),
-    fileFormat: format // html or json
+  fileName: path.join(outputDir, outputFile),
+  fileFormat: format, // html or json
+  htmlReportFormatter: formatHtmlComplexityReports,
 };
 
 const {
-    summary,
-    auditReports,
+  summary,
+  auditReports,
 } = await CodeComplexityAuditor.startAudit(directory, inputOptions);
 
 AppLogger.info(`[AuditorWorker] summary:  ${Object.keys(summary || {}).length}`);

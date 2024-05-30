@@ -1,4 +1,4 @@
-import Matcher from '../commons/Matcher.js';
+import Matcher from '../../commons/Matcher.js';
 
 /**
  * Format Halstead Metrics Reports
@@ -126,11 +126,11 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
  * */
 const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
   const complexityStatus = Matcher()
-      .on(() => cyclomaticMetric <= 10, () => 'Low risk')
-      .on(() => cyclomaticMetric > 10 && cyclomaticMetric <= 20, () => 'Moderate risk')
-      .on(() => cyclomaticMetric > 20 && cyclomaticMetric <= 40, () => 'High risk')
-      .on(() => cyclomaticMetric > 40, () => 'Most complex and highly unstable')
-      .otherwise(() => '');
+    .on(() => cyclomaticMetric <= 10, () => 'Low risk')
+    .on(() => cyclomaticMetric > 10 && cyclomaticMetric <= 20, () => 'Moderate risk')
+    .on(() => cyclomaticMetric > 20 && cyclomaticMetric <= 40, () => 'High risk')
+    .on(() => cyclomaticMetric > 40, () => 'Most complex and highly unstable')
+    .otherwise(() => '');
 
   return ({
     type: 'code-complexity',
@@ -162,13 +162,13 @@ The cyclomatic complexity report (or McCabe complexity report) presents the cycl
  * */
 const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
   const maintainabilityStatus = Matcher()
-      .on(() => Math.round(fileMaintainability || 0) < 65, () => 'Low Maintainability')
-      .on(() => Math.round(fileMaintainability || 0) >= 85, () => 'High Maintainability')
-      .on(() => (
-          Math.round(fileMaintainability || 0) >= 65 &&
+    .on(() => Math.round(fileMaintainability || 0) < 65, () => 'Low Maintainability')
+    .on(() => Math.round(fileMaintainability || 0) >= 85, () => 'High Maintainability')
+    .on(() => (
+      Math.round(fileMaintainability || 0) >= 65 &&
           Math.round(fileMaintainability || 0) < 85
-      ), () => 'Moderate Maintainability')
-      .otherwise(() => '');
+    ), () => 'Moderate Maintainability')
+    .otherwise(() => '');
 
   return ({
     type: 'code-complexity',
@@ -206,29 +206,29 @@ const buildTableHtmlData = (reportsByFile) => {
   const columnsNames = reportsByFile[files[0]][0];
 
   const tableHeaders = Object
-      .keys(columnsNames)
-      .map(key => `<th scope="col">${key}</th>`).join('\n');
+    .keys(columnsNames)
+    .map(key => `<th scope="col">${key}</th>`).join('\n');
 
   const buildReportRow = (report) => Object
-      .keys(report)
-      .map(key => `<td>${report[key]}</td>`)
-      .join('\n');
+    .keys(report)
+    .map(key => `<td>${report[key]}</td>`)
+    .join('\n');
 
   const buildReportsRows = (fileReports) => fileReports
-      .map((report) => `
+    .map((report) => `
       <tr>
         ${buildReportRow(report)}
       </tr>`).join('\n');
 
   const tableRows = files
-      .map(file => `
+    .map(file => `
       <tr>
         <td colspan="2" class="text-center bg-primary-subtle">
            <strong>${file}</strong>
         </td>
       </tr>
       ${buildReportsRows(reportsByFile[file])}`)
-      .join('\n');
+    .join('\n');
 
   return({
     tableHeaders,
@@ -237,13 +237,13 @@ const buildTableHtmlData = (reportsByFile) => {
 };
 
 /**
- * Build Html Complexity Reports
+ * Format Html Complexity Reports
  * @param {object} summary - The audit summary
  * @param {Array} descriptions - The audit report indicators descriptions
- * @param {Object} reportsByFile - The reports grouped by file..
+ * @param {Object} reportsByFile - The reports grouped by file
  * @returns {string} - The html report
  */
-const buildHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
+const formatHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
   const {
     tableHeaders,
     tableRows,
@@ -418,11 +418,11 @@ const buildHtmlComplexityReports = (summary, descriptions, reportsByFile) => {
     `;
 };
 
-const CodeComplexityConfig ={
+const CodeComplexityConfig = {
   formatHalsteadReports,
   formatMaintainabilityIndexReport,
   formatCyclomaticComplexityReport,
-  buildHtmlComplexityReports,
+  formatHtmlComplexityReports,
 };
 
 export default CodeComplexityConfig;

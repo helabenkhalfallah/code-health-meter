@@ -1,10 +1,5 @@
 import fs from 'fs-extra';
 import AppLogger from './AppLogger.js';
-import CodeComplexityConfig from '../config/CodeComplexityConfig.js';
-
-const {
- buildHtmlComplexityReports,
-} = CodeComplexityConfig;
 
 /**
  * Checks if a file is of an accepted type.
@@ -12,7 +7,7 @@ const {
  * @returns {boolean} - Returns true if the file is of an accepted type, false otherwise.
  */
 const isAcceptedFileType = (fileName) => (
-    fileName?.endsWith('.js') ||
+  fileName?.endsWith('.js') ||
     fileName?.endsWith('.jsx') ||
     fileName?.endsWith('.ts') ||
     fileName?.endsWith('.tsx') ||
@@ -25,7 +20,7 @@ const isAcceptedFileType = (fileName) => (
  * @returns {boolean} - Returns true if the file is excluded, false otherwise.
  */
 const isExcludedFile = (filePath) => (
-    filePath?.toLowerCase()?.includes('snap') ||
+  filePath?.toLowerCase()?.includes('snap') ||
     filePath?.toLowerCase()?.includes('mock') ||
     filePath?.toLowerCase()?.includes('jest') ||
     filePath?.toLowerCase()?.includes('webpack') ||
@@ -78,24 +73,29 @@ const groupReportsByFile = (reports) => reports?.reduce((acc, report) => ({
  * @param {object} summary - The audit summary
  * @param {Array} auditReports - The audit reports to format.
  * @param {string} fileFormat - The format of the file.
+ * @param {function} htmlFormatter - The html report formatter
  * @returns {string} - Returns a string with the formatted reports.
  */
-const formatReports = (summary, auditReports, fileFormat) => {
+const formatReports = ({
+  summary,
+  auditReports,
+  fileFormat,
+  htmlReportFormatter,
+}) => {
   const reportsByFile = groupReportsByFile(auditReports);
 
   if(fileFormat === 'json'){
-      return JSON.stringify({
-        summary,
-        reports: reportsByFile,
-      }, null, 2);
+    return JSON.stringify({
+      summary,
+      reports: reportsByFile,
+    }, null, 2);
   }
 
-  if(fileFormat === 'html'){
-      const descriptions = [
-          ...new Set(auditReports.map((report) => report.description) || [])
-      ].map((description, index) => `${index + 1}) ${description}`) || [];
-
-      return buildHtmlComplexityReports(summary, descriptions, reportsByFile);
+  if(fileFormat === 'html' && htmlReportFormatter){
+    const descriptions = [
+      ...new Set(auditReports.map((report) => report.description) || [])
+    ].map((description, index) => `${index + 1}) ${description}`) || [];
+    return htmlReportFormatter(summary, descriptions, reportsByFile);
   }
 
   return '';
@@ -117,6 +117,7 @@ const writeAuditToFile = (summary, auditReports, options) => {
     const {
       fileName,
       fileFormat,
+      htmlReportFormatter,
     } = options || {};
 
     const outPutFileName = `${fileName || 'CodeQualityReport'}.${fileFormat || 'json'}`;
@@ -125,7 +126,12 @@ const writeAuditToFile = (summary, auditReports, options) => {
       fs.rmSync(outPutFileName);
     }
 
-    fs.writeFileSync(outPutFileName, formatReports(summary, auditReports, fileFormat));
+    fs.writeFileSync(outPutFileName, formatReports({
+      summary,
+      auditReports,
+      fileFormat,
+      htmlReportFormatter,
+    }));
 
     return true;
   } catch (error) {

@@ -1,8 +1,7 @@
- 
-import CodeComplexityConfig from '../config/CodeComplexityConfig.js';
-import CodeAnalysisUtils from './CodeAnalysisUtils.js';
-import AuditUtils from '../commons/AuditUtils.js';
-import AppLogger from '../commons/AppLogger.js';
+import CodeComplexityConfig from './CodeComplexityConfig.js';
+import CodeComplexityUtils from './CodeComplexityUtils.js';
+import AuditUtils from '../../commons/AuditUtils.js';
+import AppLogger from '../../commons/AppLogger.js';
 
 const {
   formatHalsteadReports,
@@ -17,7 +16,7 @@ const {
 
 const {
   inspect,
-} = CodeAnalysisUtils;
+} = CodeComplexityUtils;
 
 /**
  * Build files complexity reports
@@ -71,22 +70,22 @@ const buildAuditStats = (reports) => {
   }
 
   const complexityReports = reports
-      .filter(item => item.title === 'Cyclomatic Complexity')
-      .map(report => {
-        return({
-          file: report?.file,
-          cyclomatic: report?.score,
-        });
+    .filter(item => item.title === 'Cyclomatic Complexity')
+    .map(report => {
+      return({
+        file: report?.file,
+        cyclomatic: report?.score,
       });
+    });
 
   const maintainabilityReports = reports
-      .filter(item => item.title === 'Maintainability Index IM (%)')
-      .map(report => {
-        return({
-          file: report?.file,
-          maintainability: report?.scorePercent,
-        });
+    .filter(item => item.title === 'Maintainability Index IM (%)')
+    .map(report => {
+      return({
+        file: report?.file,
+        maintainability: report?.scorePercent,
       });
+    });
 
   /*
   - 85 and above: good maintainability.
@@ -157,10 +156,10 @@ const startAudit = async (directory, options) => {
       summary,
       files,
     } = inspect(
-        {
-          srcDir: directory,
-          options,
-        }
+      {
+        srcDir: directory,
+        options,
+      }
     );
 
     AppLogger.info(`[CodeComplexityAuditor - startAudit] files:  ${files?.length}`);
@@ -173,18 +172,18 @@ const startAudit = async (directory, options) => {
     const auditReports = [];
 
     const auditableFiles = files
-        .filter((item) => {
-          const fileName = item.file;
-          return (
-              isAcceptedFileType(fileName) &&
+      .filter((item) => {
+        const fileName = item.file;
+        return (
+          isAcceptedFileType(fileName) &&
               !isExcludedFile(fileName) &&
               !fileName?.toLowerCase()?.includes('/types/') &&
               !fileName?.toLowerCase()?.includes('type') &&
               !fileName?.toLowerCase()?.includes('index') &&
               !fileName?.toLowerCase()?.includes('dico')
-          );
-        })
-        .sort((a, b) => a.fileMaintainability > b.fileMaintainability ? 1 : -1);
+        );
+      })
+      .sort((a, b) => a.fileMaintainability > b.fileMaintainability ? 1 : -1);
 
     const filesComplexityReports = buildFilesComplexityReports(auditableFiles);
 
