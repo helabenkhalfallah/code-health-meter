@@ -137,7 +137,7 @@ Or using `npx`:
    npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
    ```
 
-**Example of an HTML report:**
+**Example of HTML reports:**
 
 ![HTML_REPORT_1](HTML_REPORT_1.png)
 
