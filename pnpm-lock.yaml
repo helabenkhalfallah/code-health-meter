@@ -23,6 +23,9 @@ importers:
       lodash:
         specifier: '=4.17.21'
         version: 4.17.21
+      madge:
+        specifier: '=7.0.0'
+        version: 7.0.0(typescript@5.4.5)
       typhonjs-escomplex:
         specifier: '=0.1.0'
         version: 0.1.0
@@ -48,9 +51,6 @@ importers:
       eslint:
         specifier: '=7.5.0 || =8.0.0 || =9.0.0'
         version: 9.0.0
-      madge:
-        specifier: ^7.0.0
-        version: 7.0.0(typescript@5.4.5)
 
 packages:
 
