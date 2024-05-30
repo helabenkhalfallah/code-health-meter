@@ -139,6 +139,8 @@ Or using `npx`:
 
 **Example of an HTML report:**
 
+![HTML_REPORT_0](HTML_REPORT_0.png)
+
 ![HTML_REPORT_1](HTML_REPORT_1.png)
 
 ![HTML_REPORT_2](HTML_REPORT_2.png)
