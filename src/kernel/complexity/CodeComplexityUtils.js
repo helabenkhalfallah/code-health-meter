@@ -86,7 +86,6 @@ function findCommonBase(files) {
  * @returns {Object} - Returns a report of the analyzed module.
  */
 function process(source, options, reportInfo) {
-  AppLogger.info(`[CodeComplexityUtils - process] source:  ${source}`);
   AppLogger.info(`[CodeComplexityUtils - process] options:  ${options}`);
   AppLogger.info(`[CodeComplexityUtils - process] reportInfo:  ${reportInfo}`);
 
@@ -230,12 +229,15 @@ const parseFile = (file, commonBasePath, options) => {
 
   const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/ig;
   const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/ig;
+  const nodeModulesPattern = /node_modules/g;
 
   if (file && (
     (options.exclude && file.match(options.exclude)) ||
       file.match(mockPattern) ||
-      file.match(testPattern)
+      file.match(testPattern) ||
+      file.match(nodeModulesPattern)
   )) {
+    AppLogger.info(`[CodeComplexityUtils - parseFile] excluded file:  ${file}`);
     return null;
   }
 
