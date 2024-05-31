@@ -62,7 +62,30 @@ const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(
  * https://github.com/pahen/madge?tab=readme-ov-file#configuration
  * @type {Object}
  */
-const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir, {});
+const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir, {
+  'fileExtensions': [
+    'ts',
+    'tsx',
+    'js',
+    'jsx'
+  ],
+  excludeRegExp: [
+    '.*node_modules/.*',
+    '.*dist/.*',
+    '.*__mocks__/.*',
+    '.*husky/.*',
+    '.*husky/.*',
+    '.*vscode/.*',
+    '.*idea/.*',
+    '.*gitlab/.*',
+    '.*github/.*',
+    '.*eslint.*',
+    '.*jest.*',
+    '.*test.*',
+    '.*next.config.*',
+    '.*.d.ts.*',
+  ]
+});
 
 /**
  * Writes the audit result to files.
