@@ -169,7 +169,13 @@ Or using `npx`:
 
 ![HTML_REPORT_3](HTML_REPORT_3.png)
 
+![HTML_REPORT_3_1](HTML_REPORT_3_1.png)
+
 ![HTML_REPORT_4](HTML_REPORT_4.png)
+
+![HTML_REPORT_5](HTML_REPORT_5.png)
+
+![HTML_REPORT_6](HTML_REPORT_6.png)
 
 ---
 

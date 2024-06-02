@@ -12,6 +12,7 @@ const {
 
 const {
   getFiles,
+  parseFile,
 } = AuditUtils;
 
 /**
@@ -172,90 +173,21 @@ const getOverviewReport = (reports) => {
 };
 
 /**
- * Parses a file and returns relevant information.
- *
- * @param {string} file - The path to the file.
- * @param {string} commonBasePath - The common base path for all files.
- * @param {Object} options - The options for parsing.
- * @param {RegExp} [options.exclude] - A regular expression for files to exclude.
- * @param {boolean} [options.noempty] - Whether to skip empty lines.
- * @returns {Object|null} An object containing the file information, or null if the file is excluded or not a JavaScript/TypeScript file.
- */
-const parseFile = (file, commonBasePath, options) => {
-  AppLogger.info(`[CodeComplexityUtils - parseFile] file:  ${file}`);
-  AppLogger.info(`[CodeComplexityUtils - parseFile] commonBasePath:  ${commonBasePath}`);
-  AppLogger.info(`[CodeComplexityUtils - parseFile] options:  ${options}`);
-
-  const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/ig;
-  const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/ig;
-  const nodeModulesPattern = /node_modules/g;
-  const targetModulesPattern = /target/g;
-
-  if (file && (
-    (options.exclude && file.match(options.exclude)) ||
-      file.match(targetModulesPattern) ||
-      file.match(mockPattern) ||
-      file.match(testPattern) ||
-      file.match(nodeModulesPattern)
-  )) {
-    AppLogger.info(`[CodeComplexityUtils - parseFile] excluded file:  ${file}`);
-    return null;
-  }
-
-  if (!file.match(/\.(js|jsx|ts|tsx)$/)) {
-    return null;
-  }
-
-  AppLogger.info(`[CodeComplexityUtils - parseFile] matched file:  ${file}`);
-
-  const fileShort = file.replace(commonBasePath, '');
-  const fileSafe = fileShort.replace(/[^a-zA-Z0-9]/g, '_');
-
-  AppLogger.info(`[CodeComplexityUtils - parseFile] fileShort:  ${fileShort}`);
-  AppLogger.info(`[CodeComplexityUtils - parseFile] fileSafe:  ${fileSafe}`);
-
-  let source = fs.readFileSync(file).toString();
-  const trimmedSource = source.trim();
-
-  if (!trimmedSource) {
-    return null;
-  }
-
-  // if skip empty line option
-  if (options.noempty) {
-    source = source.replace(/^\s*[\r\n]/gm, '');
-  }
-
-  // if begins with shebang
-  if (source[0] === '#' && source[1] === '!') {
-    source = `//${source}`;
-  }
-
-  return ({
-    file,
-    fileSafe,
-    fileShort,
-    source,
-    options,
-  });
-};
-
-/**
  * Inspects a file and runs reports against it.
  *
  * @param {Object} params - The parameters for the function.
  * @param {string} params.file - The path to the file.
- * @param {string} params.commonBasePath - The common base path for all files.
+ * @param {string} params.basePath - The common base path for all files.
  * @param {Object} params.options - The options for parsing and reporting.
  * @returns {Object|null} An object containing the reports for each analyzer, or null if an error occurs.
  */
 const inspectFile = ({
   file,
-  commonBasePath,
+  basePath,
   options
 }) => {
   try {
-    const report = parseFile(file, commonBasePath, options);
+    const report = parseFile(file, basePath, options);
     if(!report){
       return null;
     }
@@ -285,7 +217,7 @@ const inspectFile = ({
           acc[analyzerName] = reporter?.process(source, options[analyzerName], reportInfo);
           return acc;
         } catch (error) {
-          console.log(`[parseFile]: file ${file} process error:  ${error}`, options);
+          AppLogger.info(`[CodeComplexityUtils - parseFile]: file ${file} process error:  ${error}`);
           return acc;
         }
       }, {});
@@ -296,57 +228,6 @@ const inspectFile = ({
 };
 
 /**
- * Finds the common base path among a list of files.
- * @param {string[]} files - The list of file paths.
- * @returns {string} - Returns the common base path.
- */
-function findCommonBase(files) {
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] files:  ${files?.length}`);
-
-  if (!files
-      || files.length === 0
-      || files.length === 1) {
-    return '';
-  }
-
-  const lastSlash = files[0].lastIndexOf(path.sep);
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] lastSlash:  ${lastSlash}`);
-
-  if (!lastSlash) {
-    return '';
-  }
-
-  const first = files[0].substr(0, lastSlash + 1);
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] first:  ${first}`);
-
-  let prefixlen = first.length;
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
-
-  /**
-   * Handles the prefixing of a file.
-   * @param {string} file - The file to handle.
-   */
-  function handleFilePrefixing(file) {
-
-    AppLogger.info(`[CodeComplexityUtils - findCommonBase] file:  ${file}`);
-
-    for (let i = prefixlen; i > 0; i--) {
-      if (file.substr(0, i) === first.substr(0, i)) {
-        prefixlen = i;
-        return;
-      }
-    }
-    prefixlen = 0;
-  }
-
-  files.forEach(handleFilePrefixing);
-
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
-
-  return first.substr(0, prefixlen);
-}
-
-/**
  * Inspect directory files.
  * @param {string} srcDir - The directory to parse.
  * @param {Object} options - The options for the parser.
@@ -354,8 +235,12 @@ function findCommonBase(files) {
  */
 const inspectFiles = (srcDir, options) => {
   try {
-    const files = getFiles(srcDir);
+    const {
+      files,
+      basePath
+    } = getFiles(srcDir);
     AppLogger.info(`[CodeComplexityUtils - inspectFiles] files:  ${files?.length}`);
+    AppLogger.info(`[CodeComplexityUtils - inspectFiles] basePath:  ${basePath}`);
 
     if(!files?.length){
       return [];
@@ -366,17 +251,13 @@ const inspectFiles = (srcDir, options) => {
       ...complexityReportOptions,
     };
 
-    const commonBasePath = findCommonBase(files);
-
-    AppLogger.info(`[CodeComplexityUtils - inspectFiles] commonBasePath:  ${commonBasePath}`);
-
     const reports = [];
 
     for (let i = 0; i < files.length; i += 1) {
       const file = files[i];
       const report = inspectFile({
         file,
-        commonBasePath,
+        basePath,
         options: mergedOptions,
       });
       if (report &&
@@ -418,11 +299,11 @@ const inspectDirectory = ({
 };
 
 /**
- * Groups reports by file.
+ * Groups code complexity reports by file.
  * @param {Array} reports - The reports to group.
  * @returns {Object} - Returns an object with the reports grouped by file.
  */
-const groupReportsByFile = (reports) => reports?.reduce((acc, report) => ({
+const groupCodeComplexityReportsByFile = (reports) => reports?.reduce((acc, report) => ({
   ...acc,
   [report.file]: [
     ...(acc[report.file] || []),
@@ -445,7 +326,7 @@ const formatCodeComplexityAuditReports = ({
   auditReports,
   fileFormat,
 }) => {
-  const reportsByFile = groupReportsByFile(auditReports);
+  const reportsByFile = groupCodeComplexityReportsByFile(auditReports);
 
   if(fileFormat === 'json'){
     return JSON.stringify({

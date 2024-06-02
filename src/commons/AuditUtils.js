@@ -1,3 +1,5 @@
+import fs from 'fs-extra';
+import path from 'path';
 import crypto from 'crypto';
 import glob from 'globby';
 import unixify from 'unixify';
@@ -60,6 +62,108 @@ const isExcludedFile = (filePath) => (
 );
 
 /**
+ * This asynchronous function reads a file and returns its content as a string.
+ *
+ * @param {string} filePath - The path to the file to be read.
+ * @returns {Promise<string|null>} A promise that resolves to a string containing the file content, or null if an error occurs.
+ *
+ * @example
+ * const content = await getAuditedFileContent('/path/to/file');
+ * print(content); // Logs the content of the file.
+ */
+const getFileContent = async (filePath) => {
+  try {
+    const fileStreamReader = fs.createReadStream(filePath);
+
+    const chunks = [];
+
+    for await (const chunk of fileStreamReader) {
+      chunks.push(Buffer.from(chunk));
+    }
+
+    return Buffer.concat(chunks)?.toString('utf-8')?.trim();
+  } catch (e) {
+    return null;
+  }
+};
+
+/**
+ * This asynchronous function checks if a file contains a specific anti-pattern.
+ *
+ * @param {string} antiPattern - The anti-pattern to check for in the file.
+ * @param {string} source - The file to check for the anti-pattern.
+ * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether the file contains the anti-pattern.
+ * If an error occurs, it logs the error message and returns false.
+ *
+ * @example
+ * const result = await isNonCompliantFile('anti-pattern', '/path/to/file');
+ * print(result); // Logs true if the file contains the anti-pattern, false otherwise.
+ */
+const isNonCompliantFile = async (antiPattern, source) => {
+  try {
+    if (!antiPattern?.length || !source?.length) {
+      return false;
+    }
+
+    return source?.includes(antiPattern);
+  } catch (error) {
+    AppLogger.info(`[AuditUtils - isNonCompliantFile] error:  ${error.message}`);
+    return false;
+  }
+};
+
+/**
+ * Finds the common base path among a list of files.
+ * @param {string[]} files - The list of file paths.
+ * @returns {string} - Returns the common base path.
+ */
+function findCommonBase(files) {
+  AppLogger.info(`[AuditUtils - findCommonBase] files:  ${files?.length}`);
+
+  if (!files
+        || files.length === 0
+        || files.length === 1) {
+    return '';
+  }
+
+  const lastSlash = files[0].lastIndexOf(path.sep);
+  AppLogger.info(`[AuditUtils - findCommonBase] lastSlash:  ${lastSlash}`);
+
+  if (!lastSlash) {
+    return '';
+  }
+
+  const first = files[0].substr(0, lastSlash + 1);
+  AppLogger.info(`[AuditUtils - findCommonBase] first:  ${first}`);
+
+  let prefixlen = first.length;
+  AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+
+  /**
+     * Handles the prefixing of a file.
+     * @param {string} file - The file to handle.
+     */
+  function handleFilePrefixing(file) {
+
+    AppLogger.info(`[AuditUtils - findCommonBase] file:  ${file}`);
+
+    for (let i = prefixlen; i > 0; i--) {
+      if (file.substr(0, i) === first.substr(0, i)) {
+        prefixlen = i;
+        return;
+      }
+    }
+    prefixlen = 0;
+  }
+
+  files.forEach(handleFilePrefixing);
+
+  AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+
+  return first.substr(0, prefixlen);
+}
+
+/**
  * Converts a pattern to a file.
  * @param {string} pattern - The pattern to convert.
  * @returns {Array} - Returns an array containing the files.
@@ -67,10 +171,17 @@ const isExcludedFile = (filePath) => (
 const patternToFile = (pattern) => glob.sync(unixify(pattern));
 
 /**
- * Retrieves all files from a specified directory.
+ * This function retrieves files from a given source directory.
  *
- * @param {string} srcDir - The source directory to retrieve files from.
- * @returns {Array|null} An array of files from the source directory, or null if the source directory is not specified or an error occurs.
+ * @param {string} srcDir - The source directory from which to retrieve files.
+ * @returns {Object} An object containing an array of files and the base path.
+ * If an error occurs, it returns an object with an empty files array and null basePath.
+ * @throws Will log the error message if one occurs.
+ *
+ * @example
+ * const result = getFiles('/path/to/source/directory');
+ * print(result.files); // Logs the array of files.
+ * print(result.basePath); // Logs the base path.
  */
 const getFiles = (srcDir) => {
   try{
@@ -90,11 +201,88 @@ const getFiles = (srcDir) => {
 
     AppLogger.info(`[AuditUtils - parseFiles] files:  ${files?.length}`);
 
-    return files;
+    const basePath = findCommonBase(files);
+
+    return ({
+      files,
+      basePath
+    });
   }catch (error) {
     AppLogger.info(`[AuditUtils - parseFiles] error:  ${error.message}`);
+    return ({
+      files: [],
+      basePath: null
+    });
+  }
+};
+
+/**
+ * Parses a file and returns relevant information.
+ *
+ * @param {string} file - The path to the file.
+ * @param {string} basePath - The base path for all files.
+ * @param {Object} options - The options for parsing.
+ * @param {RegExp} [options.exclude] - A regular expression for files to exclude.
+ * @param {boolean} [options.noempty] - Whether to skip empty lines.
+ * @returns {Object|null} An object containing the file information, or null if the file is excluded or not a JavaScript/TypeScript file.
+ */
+const parseFile = (file, basePath, options) => {
+  AppLogger.info(`[AuditUtils - parseFile] file:  ${file}`);
+  AppLogger.info(`[AuditUtils - parseFile] basePath:  ${basePath}`);
+  AppLogger.info(`[AuditUtils - parseFile] options:  ${options}`);
+
+  const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/ig;
+  const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/ig;
+  const nodeModulesPattern = /node_modules/g;
+  const targetModulesPattern = /target/g;
+
+  if (file && (
+    (options.exclude && file.match(options.exclude)) ||
+        file.match(targetModulesPattern) ||
+        file.match(mockPattern) ||
+        file.match(testPattern) ||
+        file.match(nodeModulesPattern)
+  )) {
+    AppLogger.info(`[AuditUtils - parseFile] excluded file:  ${file}`);
     return null;
   }
+
+  if (!file.match(/\.(js|jsx|ts|tsx)$/)) {
+    return null;
+  }
+
+  AppLogger.info(`[AuditUtils - parseFile] matched file:  ${file}`);
+
+  const fileShort = file.replace(basePath, '');
+  const fileSafe = fileShort.replace(/[^a-zA-Z0-9]/g, '_');
+
+  AppLogger.info(`[AuditUtils - parseFile] fileShort:  ${fileShort}`);
+  AppLogger.info(`[AuditUtils - parseFile] fileSafe:  ${fileSafe}`);
+
+  let source = fs.readFileSync(file).toString();
+  const trimmedSource = source.trim();
+
+  if (!trimmedSource) {
+    return null;
+  }
+
+  // if skip empty line option
+  if (options.noempty) {
+    source = source.replace(/^\s*[\r\n]/gm, '');
+  }
+
+  // if begins with shebang
+  if (source[0] === '#' && source[1] === '!') {
+    source = `//${source}`;
+  }
+
+  return ({
+    file,
+    fileSafe,
+    fileShort,
+    source,
+    options,
+  });
 };
 
 /**
@@ -117,6 +305,9 @@ const AuditUtils = {
   isExcludedFile,
   getFiles,
   generateHash,
+  parseFile,
+  getFileContent,
+  isNonCompliantFile,
 };
 
 export default AuditUtils;

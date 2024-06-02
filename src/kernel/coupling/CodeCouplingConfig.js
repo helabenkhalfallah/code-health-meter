@@ -73,7 +73,7 @@ const buildTableHtmlData = (reports) => {
  *   ['ModuleA', 'ModuleB', 'ModuleA']
  * ];
  *
- * console.log(buildCircularDependenciesList(circularDependencies));
+ * print(buildCircularDependenciesList(circularDependencies));
  * // Output:
  * // <h3 class="text-left pb-2 mb-2 mt-2 border-bottom border-black">
  * //     Group 1
@@ -153,19 +153,24 @@ const formatCodeCouplingHtmlReports = ({
         }
 
         h1 {
-           font-size: 2rem;
+           font-size: 2.2rem;
+           text-decoration: underline;
         }
 
         h2 {
-           font-size: 1.5rem;
+           font-size: 2.0rem;
         }
 
         h3 {
-           font-size: 1.2rem;
+           font-size: 1.8rem;
         }
 
-        span {
-           font-size: 1rem;
+        h4 {
+           font-size: 1.6rem;
+        }
+        
+        h5 {
+           font-size: 1.4rem;
         }
         
         .modal-body{
