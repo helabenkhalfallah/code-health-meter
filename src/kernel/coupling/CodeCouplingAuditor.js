@@ -1,18 +1,43 @@
 import Madge from 'madge';
 import AppLogger from '../../commons/AppLogger.js';
 
+const defaultOptions = {
+  fileExtensions: [
+    'ts',
+    'tsx',
+    'js',
+    'jsx'
+  ],
+  excludeRegExp: [
+    '.*node_modules/.*',
+    '.*target/.*',
+    '.*dist/.*',
+    '.*__mocks__/.*',
+    '.*husky/.*',
+    '.*husky/.*',
+    '.*vscode/.*',
+    '.*idea/.*',
+    '.*gitlab/.*',
+    '.*github/.*',
+    '.*eslint.*',
+    '.*jest.*',
+    '.*test.*',
+    '.*next.config.*',
+    '.*.d.ts.*',
+  ]
+};
+
 /**
  * Starts the audit process for a given directory and options.
  *
  * @async
  * @param {string} directory - The directory to audit.
- * @param {Object} options - The options for the audit.
  * @returns {Object} - Returns an object containing the results of the audit.
  * @throws {Error} - Throws an error if there was a problem starting the audit.
  */
-const startAudit = async (directory, options) => {
+const startAudit = async (directory) => {
   try {
-    const dependenciesParseResult = await Madge(directory, options);
+    const dependenciesParseResult = await Madge(directory, defaultOptions);
     if(!dependenciesParseResult) {
       return ({});
     }

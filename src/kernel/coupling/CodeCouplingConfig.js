@@ -1,8 +1,9 @@
-
-const buildTableHtmlData = ({
-  reports,
-  circular,
-}) => {
+/**
+ * This function builds the HTML data for a table.
+ * @param {Array} reports - The reports to be displayed in the table.
+ * @returns {Object} An object containing the HTML strings for the table headers and rows.
+ */
+const buildTableHtmlData = (reports) => {
   const columnsNames = [
     'file',
     'Efferent Coupling',
@@ -10,7 +11,29 @@ const buildTableHtmlData = ({
     'Instability Index'
   ];
 
-  const tableHeaders = columnsNames.map(key => `<th scope="col">${key}</th>`).join('\n');
+  const tableHeaders = columnsNames
+    .map(key => `<th scope="col">${key}</th>`).join('\n');
+
+  if(!reports?.length){
+    return({
+      tableHeaders,
+      tableRows: `
+      <tr>
+        <td>
+           No file found.
+        </td>
+        <td>
+           -
+        </td>
+        <td>
+           -
+        </td>
+        <td>
+          -
+        </td>                        
+      </tr>`,
+    });
+  }
 
   const tableRows = reports
     .map(report => `
@@ -36,6 +59,74 @@ const buildTableHtmlData = ({
   });
 };
 
+/**
+ * This function builds a list of circular dependencies in HTML format, with each group of circular dependencies separated by a header.
+ *
+ * @param {Array<Array<string>>} circularDependencies - An array of circular dependency arrays. Each inner array represents a set of circular dependencies.
+ *
+ * @returns {string} - A string representing the list of circular dependencies in HTML format, with each group of circular dependencies separated by a header. If no circular dependencies are found, it returns a specific message.
+ *
+ * @example
+ *
+ * const circularDependencies = [
+ *   ['Module1', 'Module2', 'Module3', 'Module1'],
+ *   ['ModuleA', 'ModuleB', 'ModuleA']
+ * ];
+ *
+ * console.log(buildCircularDependenciesList(circularDependencies));
+ * // Output:
+ * // <h3 class="text-left pb-2 mb-2 mt-2 border-bottom border-black">
+ * //     Group 1
+ * // </h3>
+ * // <ul class="list-group list-group-item-danger">
+ * //   <li class="list-group-item">Module1</li>
+ * //   <li class="list-group-item">Module2</li>
+ * //   <li class="list-group-item">Module3</li>
+ * //   <li class="list-group-item">Module1</li>
+ * // </ul>
+ * // <br />
+ * // <h3 class="text-left pb-2 mb-2 mt-2 border-bottom border-black">
+ * //     Group 2
+ * // </h3>
+ * // <ul class="list-group list-group-item-danger">
+ * //   <li class="list-group-item">ModuleA</li>
+ * //   <li class="list-group-item">ModuleB</li>
+ * //   <li class="list-group-item">ModuleA</li>
+ * // </ul>
+ * // <br />
+ */
+const buildCircularDependenciesList = (circularDependencies) => {
+  if(!circularDependencies?.length){
+    return 'No circular dependencies found.';
+  }
+
+  let circularDependenciesList = '';
+  for(let i= 0; i < circularDependencies?.length; i++){
+    const circularDependencyRows = circularDependencies[i]
+      .filter(dependency => dependency.length);
+
+    circularDependenciesList+=`
+        <h3 class="text-left pb-2 mb-2 mt-2 border-bottom border-black">
+            Group ${i + 1}
+        </h3>
+        <ul class="list-group list-group-item-danger">
+             ${circularDependencyRows.map(dependency => `<li class="list-group-item">${dependency}</li>`).join('\n')}
+        </ul>
+        <br />
+    `;
+  }
+
+  return circularDependenciesList;
+};
+
+/**
+ * This function formats the code coupling HTML reports.
+ * @param {Object} params - The parameters for the function.
+ * @param {Array} params.reports - The reports to be included in the HTML.
+ * @param {Array} params.circularDependencies - The circular dependencies to be included in the HTML.
+ * @param {string} params.svgFile - The SVG file to be included in the HTML.
+ * @returns {string} The formatted HTML string.
+ */
 const formatCodeCouplingHtmlReports = ({
   reports,
   circularDependencies,
@@ -44,10 +135,8 @@ const formatCodeCouplingHtmlReports = ({
   const {
     tableHeaders,
     tableRows,
-  } = buildTableHtmlData({
-    reports,
-    circularDependencies,
-  });
+  } = buildTableHtmlData(reports);
+  const circularDependenciesList = buildCircularDependenciesList(circularDependencies);
 
   return `
 <!doctype html>
@@ -71,8 +160,12 @@ const formatCodeCouplingHtmlReports = ({
            font-size: 1.5rem;
         }
 
+        h3 {
+           font-size: 1.2rem;
+        }
+
         span {
-           font-size: 0.9rem;
+           font-size: 1rem;
         }
         
         .modal-body{
@@ -97,6 +190,7 @@ const formatCodeCouplingHtmlReports = ({
     </button>
 </div>
 
+<!-- Visual Coupling -->
 <div class="container text-center mb-4 mt-4">
     <img class="img-fluid" src="${svgFile}" alt="Coupling and Circular Dependencies Analysis">
 </div>
@@ -139,8 +233,18 @@ They can help identify modules that might be problematic to maintain or evolve d
     </div>
 </div>
 
+<!-- Circular Dependencies -->
 <div class="container text-left mb-4 mt-4">
   <div class="text-start">
+     <h2 class="text-center mb-4 mt-4">Circular Dependencies Analysis</h2>
+     ${circularDependenciesList}
+  </div>
+ </div>
+ 
+<!-- Modules Stats -->
+<div class="container text-left mb-4 mt-4">
+  <div class="text-start">
+    <h2 class="text-center mb-4 mt-4">Coupling Analysis</h2>
     <table class="table table-striped table-responsive caption-top table-bordered border-primary-subtle">
       <caption>Analysis Details</caption>
       <thead class="table-light text-uppercase">
@@ -149,7 +253,7 @@ They can help identify modules that might be problematic to maintain or evolve d
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        ${tableRows}
+            ${tableRows}
       </tbody>
     </table>
   </div>

@@ -317,7 +317,10 @@ const formatCodeComplexityHtmlReport = (summary, helpMessages, reportsByFile) =>
                     <h2 class="card-title text-body-secondary mt-1">Global Status</h2>
                     <p class="card-text text-start mt-4">
                         <span class="text-primary-emphasis">
-                          Source lines of code (SLOC): <strong>${average?.sloc || 0}</strong>
+                          Total number of lines in the source code (physical SLOC): <strong>${average?.psloc || 0}</strong>
+                        </span>
+                        <span class="text-primary-emphasis">
+                          Number of lines that will be executed (logical SLOC): <strong>${average?.lsloc || 0}</strong>
                         </span>
                         <br />
                         <span class="text-primary-emphasis">

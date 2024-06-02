@@ -41,6 +41,8 @@
     "fs-extra": "=8.1.0",
     "globals": "=15.3.0",
     "globby": "=10.0.1",
+    "jscpd": "=4.0.4",
+    "jsinspect": "^0.12.7",
     "lodash": "=4.17.21",
     "madge": "=7.0.0",
     "typhonjs-escomplex": "=0.1.0",

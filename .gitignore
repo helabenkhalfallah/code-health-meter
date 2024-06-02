@@ -133,3 +133,4 @@ dist
 MyAwesomeReport.html
 *.iml
 *.idea
+target/**

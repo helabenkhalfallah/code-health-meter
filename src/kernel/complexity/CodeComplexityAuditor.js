@@ -15,7 +15,7 @@ const {
 } = AuditUtils;
 
 const {
-  inspect,
+  inspectDirectory,
 } = CodeComplexityUtils;
 
 /**
@@ -155,7 +155,7 @@ const startAudit = async (directory, options) => {
     const {
       summary,
       files,
-    } = inspect(
+    } = inspectDirectory(
       {
         srcDir: directory,
         options,
@@ -176,11 +176,7 @@ const startAudit = async (directory, options) => {
         const fileName = item.file;
         return (
           isAcceptedFileType(fileName) &&
-              !isExcludedFile(fileName) &&
-              !fileName?.toLowerCase()?.includes('/types/') &&
-              !fileName?.toLowerCase()?.includes('type') &&
-              !fileName?.toLowerCase()?.includes('index') &&
-              !fileName?.toLowerCase()?.includes('dico')
+              !isExcludedFile(fileName)
         );
       })
       .sort((a, b) => a.fileMaintainability > b.fileMaintainability ? 1 : -1);

@@ -1,21 +1,24 @@
 import fs from 'fs-extra';
 import path from 'path';
-import escomplex from 'typhonjs-escomplex';
 import lodash from 'lodash';
-import glob from 'globby';
-import unixify from 'unixify';
+import TyphonEscomplex from 'typhonjs-escomplex';
 import AppLogger from '../../commons/AppLogger.js';
+import AuditUtils from '../../commons/AuditUtils.js';
 import CodeComplexityConfig from './CodeComplexityConfig.js';
 
 const {
   formatCodeComplexityHtmlReport,
 } = CodeComplexityConfig;
 
+const {
+  getFiles,
+} = AuditUtils;
+
 /**
  * Parser options for the escomplex module analyzer.
  * @type {Object}
  */
-const parserOptions = {
+const ComplexityParserOptions = {
   sourceType: 'module',
   plugins: [
     'jsx',
@@ -28,55 +31,6 @@ const parserOptions = {
     'dynamicImport',
   ],
 };
-
-/**
- * Finds the common base path among a list of files.
- * @param {string[]} files - The list of file paths.
- * @returns {string} - Returns the common base path.
- */
-function findCommonBase(files) {
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] files:  ${files?.length}`);
-
-  if (!files || files.length === 0 || files.length === 1) {
-    return '';
-  }
-
-  const lastSlash = files[0].lastIndexOf(path.sep);
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] lastSlash:  ${lastSlash}`);
-
-  if (!lastSlash) {
-    return '';
-  }
-
-  const first = files[0].substr(0, lastSlash + 1);
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] first:  ${first}`);
-
-  let prefixlen = first.length;
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
-
-  /**
-   * Handles the prefixing of a file.
-   * @param {string} file - The file to handle.
-   */
-  function handleFilePrefixing(file) {
-
-    AppLogger.info(`[CodeComplexityUtils - findCommonBase] file:  ${file}`);
-
-    for (let i = prefixlen; i > 0; i--) {
-      if (file.substr(0, i) === first.substr(0, i)) {
-        prefixlen = i;
-        return;
-      }
-    }
-    prefixlen = 0;
-  }
-
-  files.forEach(handleFilePrefixing);
-
-  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
-
-  return first.substr(0, prefixlen);
-}
 
 /**
  * Processes the source code to generate a complexity report.
@@ -100,7 +54,7 @@ function process(source, options, reportInfo) {
   // http://www.literateprogramming.com/mccabe.pdf
   // http://horst-zuse.homepage.t-online.de/z-halstead-final-05-1.pdf
   // https://avandeursen.com/2014/08/29/think-twice-before-using-the-maintainability-index/
-  const report = escomplex.analyzeModule(source, options, parserOptions);
+  const report = TyphonEscomplex.analyzeModule(source, options, ComplexityParserOptions);
   AppLogger.info(`[CodeComplexityUtils - process] report:  ${report}`);
 
   // Make the short filename easily accessible
@@ -189,7 +143,8 @@ const getOverviewReport = (reports) => {
 
   reports.forEach((report) => {
     // clone objects so we don't have to worry about side effects
-    summary.total.sloc += report.complexity.aggregate.sloc.physical;
+    summary.total.psloc += report.complexity.aggregate.sloc.physical;
+    summary.total.lsloc += report.complexity.aggregate.sloc.logical;
     summary.total.maintainability += report.complexity.maintainability;
 
     const aggregate = lodash.cloneDeep(report.complexity.aggregate);
@@ -202,7 +157,8 @@ const getOverviewReport = (reports) => {
     }
   });
 
-  summary.average.sloc = Math.round(summary.total.sloc / reports.length);
+  summary.average.psloc = Math.round(summary.total.psloc / reports.length);
+  summary.average.lsloc = Math.round(summary.total.lsloc / reports.length);
   summary.average.maintainability = (
     summary.total.maintainability / reports.length
   ).toFixed(2);
@@ -216,11 +172,14 @@ const getOverviewReport = (reports) => {
 };
 
 /**
- * Parses a file.
- * @param {string} file - The file to parse.
- * @param {string} commonBasePath - The common base path.
- * @param {Object} options - The options for the parser.
- * @returns {Object} - Returns an object containing the analyzer result.
+ * Parses a file and returns relevant information.
+ *
+ * @param {string} file - The path to the file.
+ * @param {string} commonBasePath - The common base path for all files.
+ * @param {Object} options - The options for parsing.
+ * @param {RegExp} [options.exclude] - A regular expression for files to exclude.
+ * @param {boolean} [options.noempty] - Whether to skip empty lines.
+ * @returns {Object|null} An object containing the file information, or null if the file is excluded or not a JavaScript/TypeScript file.
  */
 const parseFile = (file, commonBasePath, options) => {
   AppLogger.info(`[CodeComplexityUtils - parseFile] file:  ${file}`);
@@ -230,9 +189,11 @@ const parseFile = (file, commonBasePath, options) => {
   const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/ig;
   const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/ig;
   const nodeModulesPattern = /node_modules/g;
+  const targetModulesPattern = /target/g;
 
   if (file && (
     (options.exclude && file.match(options.exclude)) ||
+      file.match(targetModulesPattern) ||
       file.match(mockPattern) ||
       file.match(testPattern) ||
       file.match(nodeModulesPattern)
@@ -245,13 +206,16 @@ const parseFile = (file, commonBasePath, options) => {
     return null;
   }
 
+  AppLogger.info(`[CodeComplexityUtils - parseFile] matched file:  ${file}`);
+
   const fileShort = file.replace(commonBasePath, '');
   const fileSafe = fileShort.replace(/[^a-zA-Z0-9]/g, '_');
 
+  AppLogger.info(`[CodeComplexityUtils - parseFile] fileShort:  ${fileShort}`);
+  AppLogger.info(`[CodeComplexityUtils - parseFile] fileSafe:  ${fileSafe}`);
+
   let source = fs.readFileSync(file).toString();
   const trimmedSource = source.trim();
-
-  AppLogger.info(`[CodeComplexityUtils - parseFile] trimmedSource:  ${trimmedSource}`);
 
   if (!trimmedSource) {
     return null;
@@ -267,94 +231,134 @@ const parseFile = (file, commonBasePath, options) => {
     source = `//${source}`;
   }
 
-  const reportInfo = {
+  return ({
     file,
-    fileShort,
     fileSafe,
-  };
-
-  // run reports against current file
-  return Object
-    .keys(analyzers)
-    .reduce((acc, analyzerName) => {
-      // if we should not execute parser
-      if (!options[analyzerName]) {
-        return acc;
-      }
-      try {
-        const reporter = analyzers[analyzerName];
-        acc[analyzerName] = reporter?.process(source, options[analyzerName], reportInfo);
-        return acc;
-      } catch (error) {
-        console.log(`[parseFile]: file ${file} process error:  ${error}`, options);
-        return acc;
-      }
-    }, {});
+    fileShort,
+    source,
+    options,
+  });
 };
 
 /**
- * Parses multiple files.
- * @param {Array} files - The files to parse.
+ * Inspects a file and runs reports against it.
+ *
+ * @param {Object} params - The parameters for the function.
+ * @param {string} params.file - The path to the file.
+ * @param {string} params.commonBasePath - The common base path for all files.
+ * @param {Object} params.options - The options for parsing and reporting.
+ * @returns {Object|null} An object containing the reports for each analyzer, or null if an error occurs.
+ */
+const inspectFile = ({
+  file,
+  commonBasePath,
+  options
+}) => {
+  try {
+    const report = parseFile(file, commonBasePath, options);
+    if(!report){
+      return null;
+    }
+
+    const {
+      fileSafe,
+      fileShort,
+      source,
+    } = report;
+
+    const reportInfo = {
+      file,
+      fileShort,
+      fileSafe,
+    };
+
+    // run reports against current file
+    return Object
+      .keys(analyzers)
+      .reduce((acc, analyzerName) => {
+        // if we should not execute parser
+        if (!options[analyzerName]) {
+          return acc;
+        }
+        try {
+          const reporter = analyzers[analyzerName];
+          acc[analyzerName] = reporter?.process(source, options[analyzerName], reportInfo);
+          return acc;
+        } catch (error) {
+          console.log(`[parseFile]: file ${file} process error:  ${error}`, options);
+          return acc;
+        }
+      }, {});
+  } catch (error) {
+    AppLogger.info(`[CodeComplexityUtils - inspectFile] error:  ${error.message}`);
+    return null;
+  }
+};
+
+/**
+ * Finds the common base path among a list of files.
+ * @param {string[]} files - The list of file paths.
+ * @returns {string} - Returns the common base path.
+ */
+function findCommonBase(files) {
+  AppLogger.info(`[CodeComplexityUtils - findCommonBase] files:  ${files?.length}`);
+
+  if (!files
+      || files.length === 0
+      || files.length === 1) {
+    return '';
+  }
+
+  const lastSlash = files[0].lastIndexOf(path.sep);
+  AppLogger.info(`[CodeComplexityUtils - findCommonBase] lastSlash:  ${lastSlash}`);
+
+  if (!lastSlash) {
+    return '';
+  }
+
+  const first = files[0].substr(0, lastSlash + 1);
+  AppLogger.info(`[CodeComplexityUtils - findCommonBase] first:  ${first}`);
+
+  let prefixlen = first.length;
+  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+
+  /**
+   * Handles the prefixing of a file.
+   * @param {string} file - The file to handle.
+   */
+  function handleFilePrefixing(file) {
+
+    AppLogger.info(`[CodeComplexityUtils - findCommonBase] file:  ${file}`);
+
+    for (let i = prefixlen; i > 0; i--) {
+      if (file.substr(0, i) === first.substr(0, i)) {
+        prefixlen = i;
+        return;
+      }
+    }
+    prefixlen = 0;
+  }
+
+  files.forEach(handleFilePrefixing);
+
+  AppLogger.info(`[CodeComplexityUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+
+  return first.substr(0, prefixlen);
+}
+
+/**
+ * Inspect directory files.
+ * @param {string} srcDir - The directory to parse.
  * @param {Object} options - The options for the parser.
  * @returns {Array} - Returns an array containing the reports.
  */
-const parseFiles = (files, options) => {
-  const reports = [];
-
-  const commonBasePath = findCommonBase(files);
-
-  AppLogger.info(`[CodeComplexityUtils - parseFiles] commonBasePath:  ${commonBasePath}`);
-
-  for (let i = 0; i < files.length; i += 1) {
-    const file = files[i];
-    const report = parseFile(file, commonBasePath, options);
-    if (report &&
-        Object.keys(report) &&
-        Object.keys(report).length > 0) {
-      reports.push(report);
-    }
-  }
-
-  AppLogger.info(`[CodeComplexityUtils - parseFiles] reports:  ${reports?.length}`);
-
-  return reports;
-};
-
-/**
- * Converts a pattern to a file.
- * @param {string} pattern - The pattern to convert.
- * @returns {Array} - Returns an array containing the files.
- */
-const patternToFile = (pattern) => glob.sync(unixify(pattern));
-
-/**
- * Inspects the source directory.
- * @param {Object} params - The parameters for the inspection.
- * @returns {Object} - Returns an object containing the overview report.
- */
-const inspect = ({
-  srcDir,
-  options,
-}) => {
+const inspectFiles = (srcDir, options) => {
   try {
-    AppLogger.info(`[CodeComplexityUtils - inspect] srcDir:  ${srcDir}`);
+    const files = getFiles(srcDir);
+    AppLogger.info(`[CodeComplexityUtils - inspectFiles] files:  ${files?.length}`);
 
-    if (!srcDir || !srcDir.length) {
-      return null;
-    }
-
-    const files = lodash
-      .chain([
-        srcDir,
-      ])
-      .map(patternToFile)
-      .flatten()
-      .value();
-
-    AppLogger.info(`[CodeComplexityUtils - inspect] files:  ${files?.length}`);
-
-    if (!files.length) {
-      return null;
+    if(!files?.length){
+      return [];
     }
 
     const mergedOptions = {
@@ -362,16 +366,56 @@ const inspect = ({
       ...complexityReportOptions,
     };
 
-    const reports = parseFiles(files, mergedOptions);
+    const commonBasePath = findCommonBase(files);
 
-    AppLogger.info(`[CodeComplexityUtils - inspect] reports:  ${reports?.length}`);
+    AppLogger.info(`[CodeComplexityUtils - inspectFiles] commonBasePath:  ${commonBasePath}`);
+
+    const reports = [];
+
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      const report = inspectFile({
+        file,
+        commonBasePath,
+        options: mergedOptions,
+      });
+      if (report &&
+        Object.keys(report) &&
+        Object.keys(report).length > 0) {
+        reports.push(report);
+      }
+    }
+
+    AppLogger.info(`[CodeComplexityUtils - inspectFiles] reports:  ${reports?.length}`);
+
+    return reports;
+  } catch (error) {
+    AppLogger.info(`[CodeComplexityUtils - inspectFiles] error:  ${error.message}`);
+    return null;
+  }
+};
+
+/**
+ * Inspects the source directory.
+ * @param {Object} params - The parameters for the inspection.
+ * @returns {Object} - Returns an object containing the overview report.
+ */
+const inspectDirectory = ({
+  srcDir,
+  options,
+}) => {
+  try {
+    AppLogger.info(`[CodeComplexityUtils - inspectDirectory] srcDir:  ${srcDir}`);
+
+    const reports = inspectFiles(srcDir, options);
+
+    AppLogger.info(`[CodeComplexityUtils - inspectDirectory] reports:  ${reports?.length}`);
 
     return getOverviewReport(reports);
   } catch (error) {
     return null;
   }
 };
-
 
 /**
  * Groups reports by file.
@@ -491,10 +535,10 @@ const writeCodeComplexityAuditToFile = ({
 /**
  * The CodeComplexityUtils object.
  * @typedef {Object} CodeComplexityUtils
- * @property {function} inspect - Inspects the source directory.
+ * @property {function} inspectDirectory - Inspects the source directory.
  */
 const CodeComplexityUtils = {
-  inspect,
+  inspectDirectory,
   writeCodeComplexityAuditToFile,
 };
 

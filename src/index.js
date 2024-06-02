@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util';
 import AppLogger from './commons/AppLogger.js';
 import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
 import CodeCouplingAuditor from './kernel/coupling/CodeCouplingAuditor.js';
+import CodeDuplicationAuditor from './kernel/duplication/CodeDuplicationAuditor.js';
 import CodeComplexityUtils from './kernel/complexity/CodeComplexityUtils.js';
 import CodeCouplingUtils from './kernel/coupling/CodeCouplingUtils.js';
 
@@ -58,36 +59,6 @@ const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(
 );
 
 /**
- * Starts the code coupling audit.
- * https://github.com/pahen/madge?tab=readme-ov-file#configuration
- * @type {Object}
- */
-const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir, {
-  'fileExtensions': [
-    'ts',
-    'tsx',
-    'js',
-    'jsx'
-  ],
-  excludeRegExp: [
-    '.*node_modules/.*',
-    '.*dist/.*',
-    '.*__mocks__/.*',
-    '.*husky/.*',
-    '.*husky/.*',
-    '.*vscode/.*',
-    '.*idea/.*',
-    '.*gitlab/.*',
-    '.*github/.*',
-    '.*eslint.*',
-    '.*jest.*',
-    '.*test.*',
-    '.*next.config.*',
-    '.*.d.ts.*',
-  ]
-});
-
-/**
  * Writes the audit result to files.
  */
 CodeComplexityUtils
@@ -99,6 +70,16 @@ CodeComplexityUtils
     codeComplexityAnalysisResult,
   });
 
+/**
+ * Starts the code coupling audit.
+ * https://github.com/pahen/madge?tab=readme-ov-file#configuration
+ * @type {Object}
+ */
+const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir);
+
+/**
+ * Writes the audit result to files.
+ */
 CodeCouplingUtils
   .writeCodeCouplingAuditToFile({
     codeCouplingOptions: {
@@ -108,4 +89,12 @@ CodeCouplingUtils
     codeCouplingAnalysisResult,
   });
 
-
+/**
+ * Starts the code duplication audit.
+ * @type {Object}
+ */
+CodeDuplicationAuditor.startAudit(
+  srcDir,
+  outputDir,
+  format
+);
