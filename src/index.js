@@ -78,7 +78,7 @@ const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(
 CodeComplexityUtils
   .writeCodeComplexityAuditToFile({
     codeComplexityOptions: {
-      outputDir,
+      outputDir: `${outputDir}/code-complexity-audit`,
       fileFormat: format, // html or json
     },
     codeComplexityAnalysisResult,
@@ -97,7 +97,7 @@ const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir);
 CodeCouplingUtils
   .writeCodeCouplingAuditToFile({
     codeCouplingOptions: {
-      outputDir,
+      outputDir: `${outputDir}/code-coupling-audit`,
       fileFormat: format, // html or json
     },
     codeCouplingAnalysisResult,
@@ -109,6 +109,6 @@ CodeCouplingUtils
  */
 CodeDuplicationAuditor.startAudit(
   srcDir,
-  outputDir,
+  `${outputDir}/code-duplication-audit`,
   format
 );
