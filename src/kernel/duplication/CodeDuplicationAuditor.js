@@ -16,16 +16,28 @@ const defaultOptions = {
     '**/target/**',
     '**/dist/**',
     '**/__mocks__/*',
-    '**/husky/**',
+    '**/.husky/**',
     '**/.vscode/.*',
     '**/.idea/**',
     '**/.gitlab/**',
     '**/.github/**',
-    'eslint.*',
-    'jest.*',
-    'test',
-    'next.*',
-    'babel.*',
+    '**/eslint-config/**',
+    '**/jest-config/**',
+    '**/tailwind-config/**',
+    '**/typescript-config/**',
+    '**/.eslintrc.**',
+    '**/.gitlab-ci.**',
+    '**/tailwind.**',
+    '**/tsconfig.json',
+    '**/turbo.json',
+    '**/jest.**',
+    '**/__test__/**',
+    '**/**test.**',
+    '**/**.config.**',
+    '**/webpack/**',
+    '**/**webpack**',
+    '**/next**.**',
+    'babel',
     '.*.d.ts.*'
   ]
 };
@@ -45,6 +57,10 @@ const startAudit = async (directory, outputDir, fileFormat) => {
     AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] outputDir:  ${outputDir}`);
     AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] fileFormat:  ${fileFormat}`);
 
+    // add jscpd if not installed
+    execSync('npm i -g jscpd@4.0.4');
+
+    // execute audit
     const codeDuplicationCommand = `jscpd --silent --mode "${defaultOptions.mode}" --threshold ${defaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${defaultOptions.format}" --ignore "${defaultOptions.ignore.join(',')}" ${directory}`;
     AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] jscpd script:  ${codeDuplicationCommand}`);
 
