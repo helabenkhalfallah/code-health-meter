@@ -106,8 +106,7 @@ From this, developers and managers can infer that the codebase is moderately mai
   These metrics are useful in software design for understanding dependencies and the impact of potential changes. <br />
   They can help identify modules that might be problematic to maintain or evolve due to high coupling or instability.<br />
 
-
-5. **Code Duplication Detection with Rabin–Karp Algorithm**
+6. **Code Duplication Detection with Rabin–Karp Algorithm**
 
 Code duplication is a common issue in software development that can lead to increased maintenance costs, bugs, and decreased readability. Detecting code duplication can help improve the health of your codebase.
 
