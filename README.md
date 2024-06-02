@@ -116,15 +116,29 @@ The Rabin–Karp algorithm works by comparing the hash value of the pattern with
 
 Here's a high-level overview of how the algorithm can be applied to detect code duplication:
 
-1. **Preprocessing**: The source code is tokenized into a sequence of code tokens.
+a. **Preprocessing**: The source code is tokenized into a sequence of code tokens.
 
-2. **Hashing**: Each code token is hashed using a rolling hash function. This allows for constant-time sliding window of the hash function.
+b. **Hashing**: Each code token is hashed using a rolling hash function. This allows for constant-time sliding window of the hash function.
 
-3. **Pattern Matching**: The algorithm slides the pattern over the text one symbol at a time, checking the hash values at each step. If the hash values match, it checks for an exact match.
+c. **Pattern Matching**: The algorithm slides the pattern over the text one symbol at a time, checking the hash values at each step. If the hash values match, it checks for an exact match.
 
-4. **Duplication Detection**: If an exact match is found, it indicates a duplicated block of code.
+d. **Duplication Detection**: If an exact match is found, it indicates a duplicated block of code.
 
 In **CodeHealthMeter**, we have utilized **[jscpd](https://github.com/kucherenko/jscpd)**, a code duplication detection tool that implements the Rabin-Karp algorithm. This allows us to automate the process of detecting code duplication, making it easier to maintain and improve the health of your codebase.
+
+7. **Code Security Analysis**
+CodeHealthMeter also incorporates code security analysis based on the recommendations from the Open Web Application Security Project (OWASP) and the Common Weakness Enumeration (CWE).
+
+JavaScript code security analysis focuses on preventing Cross-Site Scripting (XSS) vulnerabilities, which can lead to account impersonation, observing user behavior, loading external content, stealing sensitive data, and more.
+
+Security practices are guided by the [OWASP Top Ten Project](https://owasp.org/www-project-top-ten/), which provides a list of the most critical security risks to web applications. 
+
+We also refer to the [CWE Top 25](https://cwe.mitre.org/top25/archive/2023/2023_top25_list.html) Most Dangerous Software Weaknesses to understand and mitigate common security risks.
+
+For more details on preventing XSS vulnerabilities, you can refer to the following OWASP Cheat Sheets:
+- [Cross-Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [DOM-based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
+- [HTML Sanitization](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#html-sanitization)
 
 ---
 
