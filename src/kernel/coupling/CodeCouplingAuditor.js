@@ -22,7 +22,11 @@ const defaultOptions = {
     '.*eslint.*',
     '.*jest.*',
     '.*test.*',
-    '.*next.config.*',
+    '.*babel.*',
+    '.*webpack.*',
+    '.*.config.*',
+    '.*.types.*',
+    '.*.svg',
     '.*.d.ts.*',
   ]
 };
