@@ -9,7 +9,7 @@
 
 ## Presentation
 
-**CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation (computational complexity)** of your code's maintainability, coupling, stability, complexity, and size using a variety of established software metrics.
+**CodeHealthMeter** is a comprehensive tool designed to measure and monitor the health of a codebase. It provides a **quantitative evaluation (computational complexity)** of your code's maintainability, coupling, stability, duplication, complexity, and size using a variety of established software metrics.
 
 > Halstead complexity measurement was developed to measure a program module's complexity directly from source code, with emphasis on computational complexity. The measures were developed by the late Maurice Halstead as a means of determining a quantitative measure of complexity directly from the operators and operands in the module. [IBM DevOps Test Embedded](https://www.ibm.com/docs/en/devops-test-embedded/9.0.0?topic=metrics-halstead).
 
@@ -106,6 +106,26 @@ From this, developers and managers can infer that the codebase is moderately mai
   These metrics are useful in software design for understanding dependencies and the impact of potential changes. <br />
   They can help identify modules that might be problematic to maintain or evolve due to high coupling or instability.<br />
 
+6. **Code Duplication Detection with Rabin–Karp Algorithm**
+
+Code duplication is a common issue in software development that can lead to increased maintenance costs, bugs, and decreased readability. Detecting code duplication can help improve the health of your codebase.
+
+One effective method for detecting code duplication is the **Rabin–Karp algorithm**. This is a string-searching algorithm that uses hashing to find any one of a set of pattern strings in a text. It has been proven to be very effective in detecting duplicate lines of code, even in large codebases.
+
+The Rabin–Karp algorithm works by comparing the hash value of the pattern with the hash value of the current substring of the text. If the hash values match, it performs a direct comparison of the pattern with the substring. If the hash values do not match, it moves on to the next substring.
+
+Here's a high-level overview of how the algorithm can be applied to detect code duplication:
+
+1. **Preprocessing**: The source code is tokenized into a sequence of code tokens.
+
+2. **Hashing**: Each code token is hashed using a rolling hash function. This allows for constant-time sliding window of the hash function.
+
+3. **Pattern Matching**: The algorithm slides the pattern over the text one symbol at a time, checking the hash values at each step. If the hash values match, it checks for an exact match.
+
+4. **Duplication Detection**: If an exact match is found, it indicates a duplicated block of code.
+
+In **CodeHealthMeter**, we have utilized **[jscpd](https://github.com/kucherenko/jscpd)**, a code duplication detection tool that implements the Rabin-Karp algorithm. This allows us to automate the process of detecting code duplication, making it easier to maintain and improve the health of your codebase.
+
 ---
 
 This quantitative and mathematical approach provides a more precise and objective assessment of software quality compared to more subjective methods:
@@ -136,6 +156,8 @@ Or using `npx`:
    ```
    npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
    ```
+
+**You'll find all generated reports inside the `outputDir`.**
 
 **Example of HTML reports:**
 
