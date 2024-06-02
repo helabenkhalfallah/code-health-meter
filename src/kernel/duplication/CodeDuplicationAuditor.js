@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import fs from 'fs-extra';
 import AppLogger from '../../commons/AppLogger.js';
 
 const defaultOptions = {
@@ -47,7 +48,23 @@ const startAudit = async (directory, outputDir, fileFormat) => {
     const codeDuplicationCommand = `jscpd --silent --mode "${defaultOptions.mode}" --threshold ${defaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${defaultOptions.format}" --ignore "${defaultOptions.ignore.join(',')}" ${directory}`;
     AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] jscpd script:  ${codeDuplicationCommand}`);
 
+    // generate report
     execSync(codeDuplicationCommand);
+
+    // rename html folder
+    const temporaryHtmlReportPath = `${outputDir}/html`;
+    const finalHtmlReportPath = `${outputDir}/code-duplication`;
+    const temporaryJsonReportFilePath = `${outputDir}/jscpd-report.json`;
+    const finalJsonReportFilePath = `${outputDir}/CodeDuplicationReport.json`;
+
+    if(fs.existsSync(temporaryHtmlReportPath)) {
+      fs.renameSync(temporaryHtmlReportPath, finalHtmlReportPath);
+    }
+
+    // rename json folder
+    if(fs.existsSync(temporaryJsonReportFilePath)) {
+      fs.renameSync(temporaryJsonReportFilePath, finalJsonReportFilePath);
+    }
 
     return true;
   } catch (error) {

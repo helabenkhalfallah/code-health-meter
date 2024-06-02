@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import fs from 'fs-extra';
+import { execSync } from 'child_process';
 import { parseArgs } from 'node:util';
 import AppLogger from './commons/AppLogger.js';
 import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
@@ -42,6 +44,18 @@ const {
 if(!srcDir || !outputDir){
   AppLogger.info('srcDir is require and must be a string (npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html")');
   process.exit(-1);
+}
+
+/**
+ * Cleaning workspace
+ */
+if(fs.existsSync(outputDir)) {
+  try{
+    execSync(`rm -rf ${outputDir}`);
+  } catch(error){
+    AppLogger.info(`Code auditor cleaning workspace error:  ${error.message}`);
+    process.exit(-1);
+  }
 }
 
 /**
