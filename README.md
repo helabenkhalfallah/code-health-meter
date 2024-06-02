@@ -157,7 +157,7 @@ Or using `npx`:
    npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
    ```
 
-**You'll find all reports generated inside the `outputDir`.**
+**You'll find all generated reports inside the `outputDir`.**
 
 **Example of HTML reports:**
 
