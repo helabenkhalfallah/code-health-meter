@@ -382,28 +382,12 @@ const formatCodeComplexityHtmlReport = (summary, helpMessages, reportsByFile) =>
         <div class="col">
             <article class="card">
                 <div class="card-body mb-2 mt-2">
-                    <h2 class="card-title text-body-secondary mt-1">Global Status</h2>
-                    <p class="card-text text-start mt-4">
-                        <span class="text-primary-emphasis">
-                          Total number of lines in the source code (physical SLOC): <strong>${average?.psloc || 0}</strong>
-                        </span>
-                        <span class="text-primary-emphasis">
-                          Number of lines that will be executed (logical SLOC): <strong>${average?.lsloc || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                         Maintainability: <strong>${average?.maintainability || 0}%</strong>
-                        </span>
-                    </p>
-                </div>
-            </article>
-        </div>
-
-        <div class="col">
-            <article class="card">
-                <div class="card-body mb-2 mt-2">
                     <h2 class="card-title text-body-secondary mt-1">Maintainability Summary</h2>
                     <p class="card-text text-start mt-4">
+                        <span class="text-primary-emphasis">
+                         Average maintainability: <strong>${average?.maintainability || 0}%</strong>
+                        </span>  
+                        <br />                  
                         <span class="text-primary-emphasis">
                          Number of files with good maintainability index (>=85 %): <strong>${goodMaintainabilityTotal || 0}</strong>
                         </span>
