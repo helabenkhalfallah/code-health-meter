@@ -1,5 +1,11 @@
+import fs from 'fs-extra';
 import { execSync } from 'child_process';
 import AppLogger from '../../commons/AppLogger.js';
+import AuditUtils from '../../commons/AuditUtils.js';
+
+const {
+  getFileContent,
+} = AuditUtils;
 
 const defaultOptions = {
   'mode': 'strict',
@@ -69,6 +75,18 @@ const startAudit = async (directory, outputDir, fileFormat) => {
       execSync(codeDuplicationCommand);
     }catch (error){
       AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] execSync error:  ${error.message}`);
+    }
+
+    // modify generated html
+    if(fileFormat === 'html'){
+      const outputHtmlPath = `${outputDir}/html/index.html`;
+      const outputHtmlContent = await getFileContent(outputHtmlPath);
+      if(outputHtmlContent?.length){
+        const newOutputHtmlDocument = outputHtmlContent
+          .replace(/<header.*header>/, '')
+          .replace(/<footer.*footer>/, '');
+        fs.writeFileSync(outputHtmlPath, newOutputHtmlDocument);
+      }
     }
 
     return true;
