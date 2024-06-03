@@ -133,11 +133,13 @@ const getOverviewReport = (reports) => {
   const moduleFiles = [];
   const summary = {
     total: {
-      sloc: 0,
+      psloc: 0,
+      lsloc: 0,
       maintainability: 0,
     },
     average: {
-      sloc: 0,
+      psloc: 0,
+      lsloc: 0,
       maintainability: 0,
     },
   };
@@ -154,6 +156,10 @@ const getOverviewReport = (reports) => {
         file: report.complexity.module,
         fileMaintainability: lodash.cloneDeep(report.complexity.maintainability),
         fileComplexity: aggregate,
+        fileSLOC: {
+          physical: report.complexity.aggregate.sloc.physical,
+          logical: report.complexity.aggregate.sloc.logical,
+        },
       });
     }
   });

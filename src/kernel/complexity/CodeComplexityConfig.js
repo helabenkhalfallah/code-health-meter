@@ -196,6 +196,65 @@ The maintainability index report presents the maintainability, McCabe and Halste
 };
 
 /**
+ * This function formats the Source Lines of Code (SLOC) indicators for a given file.
+ *
+ * @param {Object} fileSLOC - An object containing the physical and logical SLOC counts for the file.
+ * @param {string} file - The name of the file.
+ *
+ * @returns {Array} codeSLOCIndicators - An array of objects, each representing a SLOC indicator for the file.
+ * Each SLOC indicator object includes the type of SLOC ('code-sloc'), the category of SLOC (either 'physical sloc' or 'logical sloc'),
+ * a title, a description, a status, the maximum and minimum scores (both set to 0), the actual score (either the physical or logical SLOC count),
+ * a percentage score (null), a score unit (an empty string), and the file name.
+ *
+ * @example
+ * const fileSLOC = {
+ *   physical: 100,
+ *   logical: 80
+ * };
+ * const file = 'example.js';
+ * const indicators = formatFileSLOCIndicators(fileSLOC, file);
+ * console.log(indicators);
+ */
+const formatFileSLOCIndicators = (fileSLOC, file) => {
+  const codeSLOCIndicators = [];
+
+  if(fileSLOC && file){
+    codeSLOCIndicators.push({
+      type: 'code-sloc',
+      category: 'physical sloc',
+      title: 'Number of lines in source code (physical SLOC)',
+      description: `Physical SLOC is the total count of lines in the source code file, including comment lines and sometimes blank lines. It gives an idea of the total size of the codebase.<br />
+      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.<br />
+      - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
+      status: null,
+      scoreMax: 0,
+      scoreMin: 0,
+      score: fileSLOC.physical || 0,
+      scorePercent: null,
+      scoreUnit: '',
+      file,
+    });
+    codeSLOCIndicators.push({
+      type: 'code-sloc',
+      category: 'logical sloc',
+      title: 'Number of lines that will be executed (logical SLOC)',
+      description: `Logical SLOC measures the number of executable statements (like operators, functions, etc.) in the source code. It gives an idea of the complexity of the codebase.<br />
+      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.<br />
+      - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
+      status: null,
+      scoreMax: 0,
+      scoreMin: 0,
+      score: fileSLOC.logical || 0,
+      scorePercent: null,
+      scoreUnit: '',
+      file,
+    });
+  }
+
+  return codeSLOCIndicators;
+};
+
+/**
  * Builds HTML data for a table.
  * @param {Object} reportsByFile - The reports grouped by file.
  * @returns {Object} - Returns an object with the table headers and rows.
@@ -438,6 +497,7 @@ const CodeComplexityConfig = {
   formatHalsteadReports,
   formatMaintainabilityIndexReport,
   formatCyclomaticComplexityReport,
+  formatFileSLOCIndicators,
   formatCodeComplexityHtmlReport,
 };
 

@@ -7,6 +7,7 @@ const {
   formatHalsteadReports,
   formatMaintainabilityIndexReport,
   formatCyclomaticComplexityReport,
+  formatFileSLOCIndicators,
 } = CodeComplexityConfig;
 
 const {
@@ -32,6 +33,7 @@ const buildFilesComplexityReports = (files) => {
         file,
         fileMaintainability,
         fileComplexity,
+        fileSLOC,
       } = item || {};
 
       AppLogger.info(`[CodeComplexityAuditor - buildFilesComplexityReports] file:  ${file}`);
@@ -46,6 +48,8 @@ const buildFilesComplexityReports = (files) => {
       } = fileComplexity || {};
 
       auditReports.push(formatMaintainabilityIndexReport(fileMaintainability, file));
+
+      auditReports.push(...formatFileSLOCIndicators(fileSLOC, file));
 
       auditReports.push(formatCyclomaticComplexityReport(cyclomatic, file));
 
