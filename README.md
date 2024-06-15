@@ -2,10 +2,10 @@
 
 # Table of Contents
 
-1. [Presentation](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#presentation)
-2. [Installation and Usage](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#installation-and-usage)
-3. [Contributing](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#contributing)
-4. [License](https://github.com/helabenkhalfallah/CodeHealthMeter/tree/main?tab=readme-ov-file#license)
+1. [Presentation](https://github.com/helabenkhalfallah/code-health-meter/tree/main?tab=readme-ov-file#presentation)
+2. [Installation and Usage](https://github.com/helabenkhalfallah/code-health-meter/tree/main?tab=readme-ov-file#installation-and-usage)
+3. [Contributing](https://github.com/helabenkhalfallah/code-health-meter/tree/main?tab=readme-ov-file#contributing)
+4. [License](https://github.com/helabenkhalfallah/code-health-meter/tree/main?tab=readme-ov-file#license)
 
 ## Presentation
 
@@ -124,10 +124,10 @@ c. **Pattern Matching**: The algorithm slides the pattern over the text one symb
 
 d. **Duplication Detection**: If an exact match is found, it indicates a duplicated block of code.
 
-In **CodeHealthMeter**, we have utilized **[jscpd](https://github.com/kucherenko/jscpd)**, a code duplication detection tool that implements the Rabin-Karp algorithm. This allows us to automate the process of detecting code duplication, making it easier to maintain and improve the health of your codebase.
+In **Code Health Meter**, we have utilized **[jscpd](https://github.com/kucherenko/jscpd)**, a code duplication detection tool that implements the Rabin-Karp algorithm. This allows us to automate the process of detecting code duplication, making it easier to maintain and improve the health of your codebase.
 
 7. **Code Security Analysis**
-CodeHealthMeter also incorporates code security analysis based on the recommendations from the Open Web Application Security Project (OWASP) and the Common Weakness Enumeration (CWE).
+**Code Health Meter** also incorporates code security analysis based on the recommendations from the Open Web Application Security Project (OWASP) and the Common Weakness Enumeration (CWE).
 
 JavaScript code security analysis focuses on preventing Cross-Site Scripting (XSS) vulnerabilities, which can lead to account impersonation, observing user behavior, loading external content, stealing sensitive data, and more.
 
@@ -199,8 +199,8 @@ Contributions are welcome! Please read the contributing guidelines before gettin
 
 1. Clone the repository:
     ```
-    git clone https://github.com/helabenkhalfallah/CodeHealthMeter.git
-    cd CodeHealthMeter
+    git clone https://github.com/helabenkhalfallah/code-health-meter.git
+    cd code-health-meter
     ```
 
 2. Install the dependencies:
