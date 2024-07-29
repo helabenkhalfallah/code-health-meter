@@ -43,6 +43,7 @@ const defaultOptions = {
     '**/webpack/**',
     '**/**webpack**',
     '**/next**.**',
+    '**/.next/**',
     'babel',
     '.*.d.ts.*'
   ]
