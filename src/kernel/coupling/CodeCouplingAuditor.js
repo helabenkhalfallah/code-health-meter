@@ -17,6 +17,7 @@ const defaultOptions = {
     '.*husky/.*',
     '.*vscode/.*',
     '.*idea/.*',
+    '.*next/.*',
     '.*gitlab/.*',
     '.*github/.*',
     '.*eslint.*',
