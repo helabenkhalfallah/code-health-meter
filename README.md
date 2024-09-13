@@ -146,22 +146,13 @@ These metrics provide valuable insights into the overall software quality and po
 
 a. **Graph-Level Metrics**
 
-* **Density:**  Measures the interconnectedness of the modules within your project. A higher density indicates a more complex system with more dependencies between modules. While a certain level of density is expected in larger projects, excessively high density might suggest tight coupling and potential challenges in maintainability and evolution.  `projectDensity` provides this metric for your project.
-* **Modularity:** Quantifies the presence of distinct communities or clusters of modules within the system. Higher modularity suggests a better separation of concerns and potential for independent development and maintenance of modules. `projectLouvainDetails` provides details about the communities detected using the Louvain algorithm, including the modularity score.
-
-b. **Node-Level Metrics**
-
-* **Degree Centrality:** Measures the number of direct dependencies a module has. High degree centrality can indicate a module with many responsibilities or one that's heavily relied upon. `projectDegreeCentrality` provides this information for each module in your project.
-* **In-Degree Centrality and Out-Degree Centrality:** Provide a more nuanced view by distinguishing between incoming (dependencies on the module) and outgoing (dependencies of the module) connections. `projectInDegreeCentrality` and `projectOutDegreeCentrality` offer these insights.
-
-c. **How These Metrics Help**
-
-By analyzing these graph metrics in conjunction with other code quality indicators, you can:
-
-* **Identify potential bottlenecks or critical modules:** These might require special attention in terms of testing, maintenance, and refactoring. High `degreeCentrality` or central positions within communities can indicate such modules.
-* **Assess the overall complexity and interconnectedness** of your project using the `projectDensity` metric
-* **Make informed decisions about refactoring or architectural changes** to enhance maintainability, testability, and scalability.
-* **Gain a deeper understanding of the complex relationships and interactions** between different parts of your codebase.
+- **projectDensity**: Offers a high-level overview of the project's complexity by quantifying the interconnectedness between modules. A high density often indicates a larger and more intricate system.
+- **projectDegreeCentrality, projectInDegreeCentrality, projectOutDegreeCentrality**:
+   - These metrics provide insights into the relative importance and dependencies of individual modules.
+   - High degree centrality suggests a module plays a central role or has many connections.
+   - High in-degree centrality implies a module is heavily relied upon by others.
+   - High out-degree centrality indicates a module has many dependencies.
+- **Louvain Communities**: Offers a visual representation of how modules are naturally grouped based on interaction patterns, providing insights into the system's modular structure and potential areas of high coupling or low cohesion.
 
 ---
 
