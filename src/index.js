@@ -8,9 +8,11 @@ import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js'
 import CodeCouplingAuditor from './kernel/coupling/CodeCouplingAuditor.js';
 import CodeDuplicationAuditor from './kernel/duplication/CodeDuplicationAuditor.js';
 import CodeSecurityAuditor from './kernel/security/CodeSecurityAuditor.js';
+import CodeModularityAuditor from './kernel/modularity/CodeModularityAuditor.js';
 import CodeComplexityUtils from './kernel/complexity/CodeComplexityUtils.js';
 import CodeCouplingUtils from './kernel/coupling/CodeCouplingUtils.js';
 import CodeSecurityUtils from './kernel/security/CodeSecurityUtils.js';
+import CodeModularityUtils from './kernel/modularity/CodeModularityUtils.js';
 
 /**
  * Parses command line arguments.
@@ -43,7 +45,7 @@ const {
 /**
  * Checks if the source directory and output directory are provided.
  */
-if(!srcDir || !outputDir){
+if (!srcDir || !outputDir) {
   AppLogger.info('srcDir is require and must be a string (npm run code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html")');
   process.exit(-1);
 }
@@ -53,10 +55,10 @@ AppLogger.info('***** Code audit start *****');
 /**
  * Cleaning workspace
  */
-if(fs.existsSync(outputDir)) {
-  try{
-    execSync(`rm -rf ${outputDir}`);
-  } catch(error){
+if (fs.existsSync(outputDir)) {
+  try {
+    execSync(`rm -rf ${outputDir}`, { stdio: 'ignore' });
+  } catch (error) {
     AppLogger.info(`Code auditor cleaning workspace error:  ${error.message}`);
     process.exit(-1);
   }
@@ -111,7 +113,7 @@ CodeCouplingUtils
  * Starts the code duplication audit.
  * @type {Object}
  */
-CodeDuplicationAuditor.startAudit(
+await CodeDuplicationAuditor.startAudit(
   srcDir,
   `${outputDir}/code-duplication-audit`,
   format
@@ -133,6 +135,25 @@ CodeSecurityUtils
       fileFormat: format, // html or json
     },
     codeSecurityAnalysisResult,
+  });
+
+/**
+ * Starts the code modularity audit.
+ * https://github.com/pahen/madge?tab=readme-ov-file#configuration
+ * @type {Object}
+ */
+const codeModularityAnalysisResult = await CodeModularityAuditor.startAudit(srcDir);
+
+/**
+ * Writes the audit result to files.
+ */
+CodeModularityUtils
+  .writeCodeModularityAuditToFile({
+    codeModularityOptions: {
+      outputDir: `${outputDir}/code-modularity-audit`,
+      fileFormat: format, // html or json
+    },
+    codeModularityAnalysisResult,
   });
 
 AppLogger.info('***** Code audit finished successfully *****');

@@ -140,6 +140,29 @@ For more details on preventing XSS vulnerabilities, you can refer to the followi
 - [DOM-based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
 - [HTML Sanitization](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#html-sanitization)
 
+8. **Graph Metrics and Their Significance for Software Quality**
+In addition to the Halstead metrics and Maintainability Index, **CodeHealthMeter** also leverages various graph metrics to analyze the structure and dependencies within your codebase. 
+These metrics provide valuable insights into the overall software quality and potential areas for improvement.
+
+a. **Graph-Level Metrics**
+
+* **Density:**  Measures the interconnectedness of the modules within your project. A higher density indicates a more complex system with more dependencies between modules. While a certain level of density is expected in larger projects, excessively high density might suggest tight coupling and potential challenges in maintainability and evolution.  `projectDensity` provides this metric for your project.
+* **Modularity:** Quantifies the presence of distinct communities or clusters of modules within the system. Higher modularity suggests a better separation of concerns and potential for independent development and maintenance of modules. `projectLouvainDetails` provides details about the communities detected using the Louvain algorithm, including the modularity score.
+
+b. **Node-Level Metrics**
+
+* **Degree Centrality:** Measures the number of direct dependencies a module has. High degree centrality can indicate a module with many responsibilities or one that's heavily relied upon. `projectDegreeCentrality` provides this information for each module in your project.
+* **In-Degree Centrality and Out-Degree Centrality:** Provide a more nuanced view by distinguishing between incoming (dependencies on the module) and outgoing (dependencies of the module) connections. `projectInDegreeCentrality` and `projectOutDegreeCentrality` offer these insights.
+
+c. **How These Metrics Help**
+
+By analyzing these graph metrics in conjunction with other code quality indicators, you can:
+
+* **Identify potential bottlenecks or critical modules:** These might require special attention in terms of testing, maintenance, and refactoring. High `degreeCentrality` or central positions within communities can indicate such modules.
+* **Assess the overall complexity and interconnectedness** of your project using the `projectDensity` metric
+* **Make informed decisions about refactoring or architectural changes** to enhance maintainability, testability, and scalability.
+* **Gain a deeper understanding of the complex relationships and interactions** between different parts of your codebase.
+
 ---
 
 This quantitative and mathematical approach provides a more precise and objective assessment of software quality compared to more subjective methods:
@@ -159,6 +182,11 @@ While these methods can provide valuable insights, they lack the objectivity and
 1. Install the dependencies:
     ```
     npm i -D code-health-meter
+    ```
+In macos you should install `graphiz`: 
+
+    ```
+    brew install graphviz || port install graphviz
     ```
 
 2. Run the analysis on your project:

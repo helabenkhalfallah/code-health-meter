@@ -60,22 +60,22 @@ const defaultOptions = {
 const startAudit = async (directory, outputDir, fileFormat) => {
   try {
 
-    AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] directory:  ${directory}`);
-    AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] outputDir:  ${outputDir}`);
-    AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] fileFormat:  ${fileFormat}`);
+    AppLogger.info(`[CodeDuplicationAuditor - startAudit] directory:  ${directory}`);
+    AppLogger.info(`[CodeDuplicationAuditor - startAudit] outputDir:  ${outputDir}`);
+    AppLogger.info(`[CodeDuplicationAuditor - startAudit] fileFormat:  ${fileFormat}`);
 
     // add jscpd if not installed
-    execSync('npm i -g jscpd@4.0.4');
+    execSync('npm i -g jscpd@4.0.4', { stdio: 'ignore' });
 
     // execute audit
     const codeDuplicationCommand = `jscpd --silent --mode "${defaultOptions.mode}" --threshold ${defaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${defaultOptions.format}" --ignore "${defaultOptions.ignore.join(',')}" ${directory}`;
-    AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] jscpd script:  ${codeDuplicationCommand}`);
+    AppLogger.info(`[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`);
 
     // generate report
     try{
-      execSync(codeDuplicationCommand);
+      execSync(codeDuplicationCommand, { stdio: 'ignore' });
     }catch (error){
-      AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] execSync error:  ${error.message}`);
+      AppLogger.info(`[CodeDuplicationAuditor - startAudit] execSync error:  ${error.message}`);
     }
 
     // modify generated html
@@ -92,7 +92,7 @@ const startAudit = async (directory, outputDir, fileFormat) => {
 
     return true;
   } catch (error) {
-    AppLogger.info(`[CodeDuplicationAuditor - inspectDirectory] error:  ${error.message}`);
+    AppLogger.info(`[CodeDuplicationAuditor - startAudit] error:  ${error.message}`);
     return false;
   }
 };
