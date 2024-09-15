@@ -146,12 +146,11 @@ These metrics provide valuable insights into the overall software quality and po
 
 a. **Graph-Level Metrics**
 
-- **projectDensity**: Offers a high-level overview of the project's complexity by quantifying the interconnectedness between modules. A high density often indicates a larger and more intricate system.
+- **projectDensity**: Gauges the overall interconnectedness. High density means lots of dependencies, potentially signifying a complex system.
 - **projectDegreeCentrality, projectInDegreeCentrality, projectOutDegreeCentrality**:
-   - These metrics provide insights into the relative importance and dependencies of individual modules.
-   - High degree centrality suggests a module plays a central role or has many connections.
-   - High in-degree centrality implies a module is heavily relied upon by others.
-   - High out-degree centrality indicates a module has many dependencies.
+   - **High degree centrality**: suggests a module plays a central role or has many connections.
+   - **High in-degree centrality**: Module is heavily relied upon, many others depend on it.
+   - **High out-degree centrality**: Module has a lot of dependencies on other parts of the system.
 - **Louvain Communities**: Offers a visual representation of how modules are **naturally grouped based on interaction patterns**, providing insights into the system's modular structure and potential areas of high coupling or low cohesion.
 - **Independent File Ratio**: `Independent File Ratio = 1 - Interaction Density(Louvain Modularity)` since **Louvain modularity captures the strength of interactions within communities**.
    - **High Interaction Density (High Louvain Modularity)**: This signifies strong interactions within communities, suggesting high coupling between files or modules within those groups. This implies lower "real modularity" as the components are more intertwined.
