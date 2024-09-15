@@ -150,7 +150,9 @@ a. **Graph-Level Metrics**
 - **projectDegreeCentrality, projectInDegreeCentrality, projectOutDegreeCentrality**:
    - **High degree centrality**: suggests a module plays a central role or has many connections.
    - **High in-degree centrality**: Module is heavily relied upon, many others depend on it.
+     - In-Degree Centrality: The number of incoming edges (connections from other nodes to this node).
    - **High out-degree centrality**: Module has a lot of dependencies on other parts of the system.
+     - Out-Degree Centrality: The number of outgoing edges (connections from this node to other nodes).
 - **Louvain Communities**: Offers a visual representation of how modules are **naturally grouped based on interaction patterns**, providing insights into the system's modular structure and potential areas of high coupling or low cohesion.
 - **Independent File Ratio**: `Independent File Ratio = 1 - Interaction Density(Louvain Modularity)` since **Louvain modularity captures the strength of interactions within communities**.
    - **High Interaction Density (High Louvain Modularity)**: This signifies strong interactions within communities, suggesting high coupling between files or modules within those groups. This implies lower "real modularity" as the components are more intertwined.
