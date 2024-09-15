@@ -154,8 +154,8 @@ a. **Graph-Level Metrics**
    - High out-degree centrality indicates a module has many dependencies.
 - **Louvain Communities**: Offers a visual representation of how modules are **naturally grouped based on interaction patterns**, providing insights into the system's modular structure and potential areas of high coupling or low cohesion.
 - **Independent File Ratio**: `Independent File Ratio = 1 - Interaction Density(Louvain Modularity)` since **Louvain modularity captures the strength of interactions within communities**.
-   - **High Louvain Modularity**: This signifies strong interactions within communities, suggesting high coupling between files or modules within those groups. This implies lower "real modularity" as the components are more intertwined.
-   - **Low Louvain Modularity**: This indicates weaker interactions between communities, potentially suggesting looser coupling and a higher degree of "real modularity."
+   - **High Interaction Density (High Louvain Modularity)**: This signifies strong interactions within communities, suggesting high coupling between files or modules within those groups. This implies lower "real modularity" as the components are more intertwined.
+   - **Low Interaction Density (Low Louvain Modularity)**: This indicates weaker interactions between communities, potentially suggesting looser coupling and a higher degree of "real modularity."
 
 ---
 
