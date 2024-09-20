@@ -144,8 +144,6 @@ For more details on preventing XSS vulnerabilities, you can refer to the followi
 In addition to the Halstead metrics and Maintainability Index, **CodeHealthMeter** also leverages various graph metrics to analyze the structure and dependencies within your codebase. 
 These metrics provide valuable insights into the overall software quality and potential areas for improvement.
 
-a. **Graph-Level Metrics**
-
 - **projectDensity**: Gauges the overall interconnectedness. High density means lots of dependencies, potentially signifying a complex system.
 - **projectDegreeCentrality, projectInDegreeCentrality, projectOutDegreeCentrality**:
    - **High degree centrality**: suggests a module plays a central role or has many connections.
