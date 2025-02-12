@@ -3,44 +3,33 @@
  * @module CodeModularityUtils
  */
 
-import AppLogger from '../../commons/AppLogger.js';
 import path from 'path';
 import fs from 'fs-extra';
+import AppLogger from '../../commons/AppLogger.js';
+import CodeModularityConfig from './CodeModularityConfig.js';
 
 /**
  * Formats the code modularity audit reports based on the specified file format.
  * @function formatCodeModularityAuditReports
  * @param {Object} options - Options for formatting.
  * @param {string} options.fileFormat - The desired output file format ('json' or 'html').
- * @param {Object} options.projectTree - The project tree data.
- * @param {Graph} options.projectGraph - The Graphology graph representing the project.
- * @param {Object} options.projectLouvainDetails - The detailed results of the Louvain community detection.
+ * @param {Object} options.reports - The detailed results of the Modularity Analysis.
  * @returns {string} - The formatted report content.
  */
 const formatCodeModularityAuditReports = ({
   fileFormat,
-  projectTree,
-  projectGraph,
-  projectLouvainDetails,
-  projectDensity,
-  projectDegreeCentrality,
-  projectInDegreeCentrality,
-  projectOutDegreeCentrality,
+  reports
 }) => {
+  if(!reports){
+    return '';
+  }
+
   if(fileFormat === 'json'){
-    return JSON.stringify({
-      projectTree,
-      projectGraph,
-      projectLouvainDetails,
-      projectDensity,
-      projectDegreeCentrality,
-      projectInDegreeCentrality,
-      projectOutDegreeCentrality,
-    }, null, 2);
+    return JSON.stringify(reports, null, 2);
   }
 
   if(fileFormat === 'html'){
-    return ''; // Placeholder for future HTML formatting implementation
+    return CodeModularityConfig.formatCodeModularityHtmlReports(reports);
   }
 
   return ''; // Default to empty string if format is not recognized
@@ -54,9 +43,7 @@ const formatCodeModularityAuditReports = ({
  * @param {string} options.codeModularityOptions.outputDir - The output directory for the report.
  * @param {string} options.codeModularityOptions.fileFormat - The desired output file format.
  * @param {Object} options.codeModularityAnalysisResult - The results of the code modularity analysis.
- * @param {Object} options.codeModularityAnalysisResult.projectTree - The project tree data.
- * @param {Graph} options.codeModularityAnalysisResult.projectGraph - The Graphology graph.
- * @param {Object} options.codeModularityAnalysisResult.projectLouvainDetails - Louvain details.
+ * @param {Object} options.codeModularityAnalysisResult.louvainDetails - Louvain details.
  * @returns {boolean} - `true` if the write operation was successful, `false` otherwise.
  */
 const writeCodeModularityAuditToFile = ({
@@ -81,26 +68,19 @@ const writeCodeModularityAuditToFile = ({
     }
 
     const {
-      projectTree,
-      projectGraph,
-      projectLouvainDetails,
-      projectDensity,
-      projectDegreeCentrality,
-      projectInDegreeCentrality,
-      projectOutDegreeCentrality,
+      louvainDetails,
+      density,
+      degreeCentrality,
+      inDegreeCentrality,
+      outDegreeCentrality,
+      svg,
     } = codeModularityAnalysisResult;
 
-    AppLogger.info('[CodeModularityUtils - startAudit] projectTree:', projectTree);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectGraph:', projectGraph);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectLouvainDetails:', projectLouvainDetails);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectDensity:', projectDensity);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectDegreeCentrality:', projectDegreeCentrality);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectInDegreeCentrality:', projectInDegreeCentrality);
-    AppLogger.info('[CodeModularityUtils - startAudit] projectOutDegreeCentrality:', projectOutDegreeCentrality);
-
-    if(!projectTree){
-      return false;
-    }
+    AppLogger.info('[CodeModularityUtils - startAudit] louvainDetails:', louvainDetails);
+    AppLogger.info('[CodeModularityUtils - startAudit] density:', density);
+    AppLogger.info('[CodeModularityUtils - startAudit] degreeCentrality:', degreeCentrality);
+    AppLogger.info('[CodeModularityUtils - startAudit] inDegreeCentrality:', inDegreeCentrality);
+    AppLogger.info('[CodeModularityUtils - startAudit] outDegreeCentrality:', outDegreeCentrality);
 
     const codeModularityAuditOutputFileName = `CodeModularityReport.${fileFormat || 'json'}`;
     AppLogger.info(`[CodeModularityUtils - writeCodeComplexityAuditToFile] codeModularityAuditOutputFileName:  ${codeModularityAuditOutputFileName}`);
@@ -122,13 +102,15 @@ const writeCodeModularityAuditToFile = ({
 
     const formattedModularityAuditReports = formatCodeModularityAuditReports({
       fileFormat,
-      projectTree,
-      projectGraph,
-      projectLouvainDetails,
-      projectDensity,
-      projectDegreeCentrality,
-      projectInDegreeCentrality,
-      projectOutDegreeCentrality,
+      reports: {
+        modularity: louvainDetails?.modularity,
+        communities: louvainDetails?.communities,
+        density,
+        degreeCentrality,
+        inDegreeCentrality,
+        outDegreeCentrality,
+        svgFile: svgOutputFileName
+      }
     });
 
     if(!formattedModularityAuditReports?.length){
@@ -136,6 +118,13 @@ const writeCodeModularityAuditToFile = ({
     }
 
     fs.writeFileSync(codeModularityAuditOutputFile, formattedModularityAuditReports);
+
+    if(svg){
+      if(fs.existsSync(svgOutputFile)){
+        fs.rmSync(svgOutputFile);
+      }
+      fs.writeFileSync(svgOutputFile, svg);
+    }
 
     return true;
   } catch (error) {

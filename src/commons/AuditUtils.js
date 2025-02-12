@@ -7,6 +7,107 @@ import lodash from 'lodash';
 import AppLogger from './AppLogger.js';
 
 /**
+ * Options for creating the Graphology graph.
+ * @const {Object} graphologyDefaultOptions
+ * @property {'directed'} type - Specifies a directed graph.
+ * @property {true} allowSelfLoops - Allows self-loops in the graph.
+ * @property {false} multi - Disallows multiple edges between the same pair of nodes.
+ */
+const graphologyDefaultOptions = {
+  type: 'directed',
+  allowSelfLoops: true,
+  multi: false
+};
+
+/**
+ * Options for the Louvain community detection algorithm.
+ * @const {Object} louvainDefaultOptions
+ * @property {number} resolution - Resolution parameter for the Louvain algorithm (default: 1).
+ */
+const louvainDefaultOptions = {
+  resolution: 0.74,
+};
+
+/**
+ * Default options for the Madge analysis.
+ * @type {{fileExtensions: string[], excludeRegExp: string[]}}
+ */
+const madgeDefaultOptions = {
+  fileExtensions: [
+    'ts',
+    'tsx',
+    'js',
+    'jsx'
+  ],
+  excludeRegExp: [
+    '.*node_modules/.*',
+    '.*target/.*',
+    '.*dist/.*',
+    '.*__mocks__/.*',
+    '.*husky/.*',
+    '.*husky/.*',
+    '.*vscode/.*',
+    '.*idea/.*',
+    '.*next/.*',
+    '.*gitlab/.*',
+    '.*github/.*',
+    '.*eslint.*',
+    '.*jest.*',
+    '.*test.*',
+    '.*babel.*',
+    '.*webpack.*',
+    '.*.types.*',
+    '.*.svg',
+    '.*.d.ts.*',
+  ]
+};
+
+/**
+ * Default options for the code duplication analysis.
+ * */
+const codeDuplicationDefaultOptions = {
+  'mode': 'strict',
+  'threshold': 0,
+  'format': [
+    'javascript',
+    'typescript',
+    'jsx',
+    'tsx'
+  ],
+  'ignore': [
+    '**/node_modules/**',
+    '**/target/**',
+    '**/dist/**',
+    '**/__mocks__/*',
+    '**/mocks/*',
+    '**/.husky/**',
+    '**/.vscode/.*',
+    '**/.idea/**',
+    '**/.gitlab/**',
+    '**/.github/**',
+    '**/eslint-config/**',
+    '**/jest-config/**',
+    '**/tailwind-config/**',
+    '**/typescript-config/**',
+    '**/.eslintrc.**',
+    '**/.gitlab-ci.**',
+    '**/tailwind.**',
+    '**/tsconfig.json',
+    '**/turbo.json',
+    '**/jest.**',
+    '**/__test__/**',
+    '**/**test.**',
+    '**/**.config.**',
+    '**/webpack/**',
+    '**/**webpack**',
+    '**/next**.**',
+    '**/.next/**',
+    'babel',
+    '.*.d.ts.*'
+  ]
+};
+
+/**
  * Checks if a file is of an accepted type.
  * @param {string} fileName - The name of the file.
  * @returns {boolean} - Returns true if the file is of an accepted type, false otherwise.
@@ -308,6 +409,10 @@ const AuditUtils = {
   parseFile,
   getFileContent,
   isNonCompliantFile,
+  madgeDefaultOptions,
+  graphologyDefaultOptions,
+  louvainDefaultOptions,
+  codeDuplicationDefaultOptions
 };
 
 export default AuditUtils;

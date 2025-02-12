@@ -342,10 +342,10 @@ const formatCodeComplexityAuditReports = ({
   }
 
   if(fileFormat === 'html'){
-    const helpMessages = [
-      ...new Set(auditReports.map((report) => report.description) || [])
-    ].map((description, index) => `${index + 1}) ${description}`) || [];
-    return formatCodeComplexityHtmlReport(summary, helpMessages, reportsByFile);
+    return formatCodeComplexityHtmlReport({
+      summary,
+      reports: reportsByFile
+    });
   }
 
   return '';
@@ -414,6 +414,7 @@ const writeCodeComplexityAuditToFile = ({
 
     return true;
   } catch (error) {
+    console.log(error);
     AppLogger.info(`[CodeComplexityUtils - writeCodeComplexityAuditToFile] error:  ${error.message}`);
     return false;
   }

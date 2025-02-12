@@ -5,13 +5,9 @@ import { execSync } from 'child_process';
 import { parseArgs } from 'node:util';
 import AppLogger from './commons/AppLogger.js';
 import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
-import CodeCouplingAuditor from './kernel/coupling/CodeCouplingAuditor.js';
 import CodeDuplicationAuditor from './kernel/duplication/CodeDuplicationAuditor.js';
-import CodeSecurityAuditor from './kernel/security/CodeSecurityAuditor.js';
 import CodeModularityAuditor from './kernel/modularity/CodeModularityAuditor.js';
 import CodeComplexityUtils from './kernel/complexity/CodeComplexityUtils.js';
-import CodeCouplingUtils from './kernel/coupling/CodeCouplingUtils.js';
-import CodeSecurityUtils from './kernel/security/CodeSecurityUtils.js';
 import CodeModularityUtils from './kernel/modularity/CodeModularityUtils.js';
 
 /**
@@ -91,25 +87,6 @@ CodeComplexityUtils
   });
 
 /**
- * Starts the code coupling audit.
- * https://github.com/pahen/madge?tab=readme-ov-file#configuration
- * @type {Object}
- */
-const codeCouplingAnalysisResult = await CodeCouplingAuditor.startAudit(srcDir);
-
-/**
- * Writes the audit result to files.
- */
-CodeCouplingUtils
-  .writeCodeCouplingAuditToFile({
-    codeCouplingOptions: {
-      outputDir: `${outputDir}/code-coupling-audit`,
-      fileFormat: format, // html or json
-    },
-    codeCouplingAnalysisResult,
-  });
-
-/**
  * Starts the code duplication audit.
  * @type {Object}
  */
@@ -118,24 +95,6 @@ await CodeDuplicationAuditor.startAudit(
   `${outputDir}/code-duplication-audit`,
   format
 );
-
-/**
- * Starts the code security audit.
- * @type {Object}
- */
-const codeSecurityAnalysisResult = await CodeSecurityAuditor.startAudit(srcDir, {});
-
-/**
- * Writes the audit result to files.
- */
-CodeSecurityUtils
-  .writeCodeSecurityAuditToFile({
-    codeSecurityOptions: {
-      outputDir: `${outputDir}/code-security-audit`,
-      fileFormat: format, // html or json
-    },
-    codeSecurityAnalysisResult,
-  });
 
 /**
  * Starts the code modularity audit.

@@ -14,58 +14,13 @@ import {
   inDegreeCentrality,
   outDegreeCentrality
 } from 'graphology-metrics/centrality/degree.js';
+import AuditUtils from '../../commons/AuditUtils.js';
 
-/**
- * Default options for Madge analysis.
- * @const {Object} defaultOptions
- * @property {string[]} fileExtensions - Array of file extensions to include in the analysis.
- * @property {RegExp[]} excludeRegExp - Array of regular expressions to exclude files or directories from the analysis.
- */
-const defaultOptions = {
-  fileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  excludeRegExp: [
-    '.*node_modules/.*',
-    '.*target/.*',
-    '.*dist/.*',
-    '.*__mocks__/.*',
-    '.*husky/.*',
-    '.*vscode/.*',
-    '.*idea/.*',
-    '.*gitlab/.*',
-    '.*github/.*',
-    '.*eslint.*',
-    '.*jest.*',
-    '.*test.*',
-    '.*babel.*',
-    '.*webpack.*',
-    '.*.config.*',
-    '.*.types.*',
-    '.*.svg',
-    '.*.d.ts.*',
-  ],
-};
-
-/**
- * Options for creating the Graphology graph.
- * @const {Object} GRAPH_OPTIONS
- * @property {'directed'} type - Specifies a directed graph.
- * @property {true} allowSelfLoops - Allows self-loops in the graph.
- * @property {false} multi - Disallows multiple edges between the same pair of nodes.
- */
-const GRAPH_OPTIONS = {
-  type: 'directed',
-  allowSelfLoops: true,
-  multi: false
-};
-
-/**
- * Options for the Louvain community detection algorithm.
- * @const {Object} LOUVAIN_ALGO_OPTIONS
- * @property {number} resolution - Resolution parameter for the Louvain algorithm (default: 1).
- */
-const LOUVAIN_ALGO_OPTIONS = {
-  resolution: 0.98,
-};
+const {
+  madgeDefaultOptions,
+  graphologyDefaultOptions,
+  louvainDefaultOptions
+} = AuditUtils;
 
 /**
  * XML to JavaScript parser instance.
@@ -156,7 +111,7 @@ const normalizeProjectTree = (tree) => {
  */
 const startAudit = async (directory) => {
   try {
-    const projectAnalysisResult = await Madge(directory, defaultOptions);
+    const projectAnalysisResult = await Madge(directory, madgeDefaultOptions);
     if(!projectAnalysisResult) {
       return ({});
     }
@@ -174,8 +129,7 @@ const startAudit = async (directory) => {
 
     const { nodes, edges } = normalizeProjectTree(projectTree) || {};
     const projectTreeData =  await retrieveProjectTreeData(projectTreeVisualization);
-
-    const projectGraph = new Graph(GRAPH_OPTIONS);
+    const projectGraph = new Graph(graphologyDefaultOptions);
 
     nodes
       .filter(item => item)
@@ -194,16 +148,22 @@ const startAudit = async (directory) => {
         projectGraph.addEdge(source, target);
       });
 
-    const louvainDetails = louvain.detailed(projectGraph, LOUVAIN_ALGO_OPTIONS);
+    const louvainDetails = louvain.detailed(projectGraph, louvainDefaultOptions);
 
     return({
-      projectTree,
-      projectGraph,
-      projectLouvainDetails: louvainDetails,
-      projectDensity: density(projectGraph),
-      projectDegreeCentrality: degreeCentrality(projectGraph),
-      projectInDegreeCentrality: inDegreeCentrality(projectGraph),
-      projectOutDegreeCentrality: outDegreeCentrality(projectGraph),
+      tree: projectTree,
+      graph: projectGraph,
+      louvainDetails,
+      warnings: projectAnalysisResult.warnings(),
+      circular: projectAnalysisResult.circular(),
+      circularGraph: projectAnalysisResult.circularGraph(),
+      orphans: projectAnalysisResult.orphans(),
+      leaves: projectAnalysisResult.leaves(),
+      svg: projectTreeVisualization,
+      density: density(projectGraph),
+      degreeCentrality: degreeCentrality(projectGraph),
+      inDegreeCentrality: inDegreeCentrality(projectGraph),
+      outDegreeCentrality: outDegreeCentrality(projectGraph),
     });
   } catch (error) {
     AppLogger.info(`[CodeModularityAuditor - startAudit] error:  ${error.message}`);

@@ -1,6 +1,122 @@
 import Matcher from '../../commons/Matcher.js';
 
 /**
+ * Format Html Complexity Reports
+ * @param {object} summary - The audit summary
+ * @param {Object} reports - The reports grouped by file
+ * @returns {string} - The html report
+ */
+const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
+  const codeComplexityReport = { summary, reports };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Quality Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .toggle { cursor: pointer; color: blue; text-decoration: underline; }
+        .hidden { display: none; }
+        .search { margin-bottom: 10px; padding: 5px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Code Quality Report</h1>
+        <div class="section">
+            <h2>Summary</h2>
+            <p><strong>Total Physical SLOC:</strong> <span id="total-psloc"></span></p>
+            <p><strong>Total Logical SLOC:</strong> <span id="total-lsloc"></span></p>
+            <p><strong>Total Maintainability:</strong> <span id="total-maintainability"></span></p>
+            <p><strong>Average Physical SLOC:</strong> <span id="avg-psloc"></span></p>
+            <p><strong>Average Logical SLOC:</strong> <span id="avg-lsloc"></span></p>
+            <p><strong>Average Maintainability:</strong> <span id="avg-maintainability"></span></p>
+        </div>
+        
+        <input type="text" class="search" placeholder="Search files..." id="search">
+        
+        <div class="section">
+            <h2>File Reports</h2>
+            <div id="reports"></div>
+        </div>
+    </div>
+    
+    <script>
+        const codeComplexityReport = ${JSON.stringify(codeComplexityReport, null, 2)};
+
+        // Fill summary data
+        if (codeComplexityReport?.summary?.total) {
+            document.getElementById("total-psloc").textContent = codeComplexityReport.summary.total.psloc;
+            document.getElementById("total-lsloc").textContent = codeComplexityReport.summary.total.lsloc;
+            document.getElementById("total-maintainability").textContent = codeComplexityReport.summary.total.maintainability.toFixed(2);
+        }
+
+        if (codeComplexityReport?.summary?.average) {
+            document.getElementById("avg-psloc").textContent = codeComplexityReport.summary.average.psloc;
+            document.getElementById("avg-lsloc").textContent = codeComplexityReport.summary.average.lsloc;
+            document.getElementById("avg-maintainability").textContent = codeComplexityReport.summary.average.maintainability;
+        }
+
+        // Populate File Reports
+        if (codeComplexityReport?.reports && Object.keys(codeComplexityReport.reports).length !== 0) {
+            const reportsDiv = document.getElementById("reports");
+
+            Object.entries(codeComplexityReport.reports).forEach(([file, metrics]) => {
+                const fileDiv = document.createElement("div");
+                fileDiv.classList.add("section");
+
+                // Create file header with toggle button
+                const fileHeader = document.createElement("h3");
+                fileHeader.textContent = file;
+                const toggleSpan = document.createElement("span");
+                toggleSpan.className = "toggle";
+                toggleSpan.textContent = "▶ ";
+                fileHeader.prepend(toggleSpan);
+                fileHeader.onclick = function () {
+                    const details = fileDiv.querySelector(".details");
+                    details.classList.toggle("hidden");
+                    this.querySelector(".toggle").textContent = details.classList.contains("hidden") ? "▶" : "▼";
+                };
+                fileDiv.appendChild(fileHeader);
+
+                // Create details section with metrics table
+                const detailsDiv = document.createElement("div");
+                detailsDiv.classList.add("details", "hidden");
+
+                const table = document.createElement("table");
+                table.innerHTML = \`<tr><th>Metric</th><th>Score</th></tr>\`;
+                metrics.forEach(metric => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = \`<td>\${metric.title}</td><td>\${metric.score}</td>\`;
+                    table.appendChild(row);
+                });
+                detailsDiv.appendChild(table);
+                fileDiv.appendChild(detailsDiv);
+
+                reportsDiv.appendChild(fileDiv);
+            });
+
+            // Implement Search Feature
+            document.getElementById("search").addEventListener("input", function () {
+                const searchText = this.value.toLowerCase();
+                document.querySelectorAll(".section h3").forEach(h3 => {
+                    h3.parentElement.style.display = h3.textContent.toLowerCase().includes(searchText) ? "block" : "none";
+                });
+            });
+        }
+    </script>
+</body>
+</html>`;
+};
+
+/**
  * Format Halstead Metrics Reports
  * @param {object} halsteadMetrics
  * @param {string} file
@@ -136,12 +252,12 @@ const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
     type: 'code-complexity',
     category: 'cyclomatic',
     title: 'Cyclomatic Complexity',
-    description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).<br /> 
-          The larger the cyclomatic number, the more execution paths there will be in the function, and the more difficult it will be to understand and test:<br />
-          - If the cyclomatic number is 1 to 10, then the code is structured, well written, highly testable, the cost and effort are less.<br />
-          - If the cyclomatic number is 10 to 20, the code is complex and moderately testable, and the cost and effort are medium.<br />
-          - If the cyclomatic number is 20 to 40, then the code is very complex and poorly testable, and the cost and effort are high.<br />
-          - If the cyclomatic number is > 40, it is not testable at all, and the cost and effort are very high.<br />
+    description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).
+          The larger the cyclomatic number, the more execution paths there will be in the function, and the more difficult it will be to understand and test:
+          - If the cyclomatic number is 1 to 10, then the code is structured, well written, highly testable, the cost and effort are less.
+          - If the cyclomatic number is 10 to 20, the code is complex and moderately testable, and the cost and effort are medium.
+          - If the cyclomatic number is 20 to 40, then the code is very complex and poorly testable, and the cost and effort are high.
+          - If the cyclomatic number is > 40, it is not testable at all, and the cost and effort are very high.
 
 The cyclomatic complexity report (or McCabe complexity report) presents the cyclomatic complexity (general measure of the solidity and reliability of a program) for the selected project entity.`,
     status: complexityStatus,
@@ -174,15 +290,15 @@ const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
     type: 'code-complexity',
     category: 'maintainability',
     title: 'Maintainability Index IM (%)',
-    description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.<br />
-    - 85 and above: good maintainability.<br />
-    - 65–85: moderate maintainability.<br />
-    - < 65: difficult to maintain.<br />
-    The maintainability index is calculated using the following formula:<br />
-    171 - 5.2 * ln(Halstead Volume) - 0.23 * (Cyclomatic Complexity) - 16.2 * ln(Number of statements)<br />
-    - V represents the Halstead Volume.<br />
-    - N represents the length of the program.<br />
-    - n represents the size of the dictionary.<br />
+    description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.
+    - 85 and above: good maintainability.
+    - 65–85: moderate maintainability.
+    - < 65: difficult to maintain.
+    The maintainability index is calculated using the following formula:
+    171 - 5.2 * ln(Halstead Volume) - 0.23 * (Cyclomatic Complexity) - 16.2 * ln(Number of statements)
+    - V represents the Halstead Volume.
+    - N represents the length of the program.
+    - n represents the size of the dictionary.
        
 The maintainability index report presents the maintainability, McCabe and Halstead measures combined for the current project.`,
     status: maintainabilityStatus,
@@ -223,8 +339,8 @@ const formatFileSLOCIndicators = (fileSLOC, file) => {
       type: 'code-sloc',
       category: 'physical sloc',
       title: 'Number of lines in source code (physical SLOC)',
-      description: `Physical SLOC is the total count of lines in the source code file, including comment lines and sometimes blank lines. It gives an idea of the total size of the codebase.<br />
-      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.<br />
+      description: `Physical SLOC is the total count of lines in the source code file, including comment lines and sometimes blank lines. It gives an idea of the total size of the codebase.
+      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.
       - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
       status: null,
       scoreMax: 0,
@@ -238,8 +354,8 @@ const formatFileSLOCIndicators = (fileSLOC, file) => {
       type: 'code-sloc',
       category: 'logical sloc',
       title: 'Number of lines that will be executed (logical SLOC)',
-      description: `Logical SLOC measures the number of executable statements (like operators, functions, etc.) in the source code. It gives an idea of the complexity of the codebase.<br />
-      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.<br />
+      description: `Logical SLOC measures the number of executable statements (like operators, functions, etc.) in the source code. It gives an idea of the complexity of the codebase.
+      - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.
       - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
       status: null,
       scoreMax: 0,
@@ -252,229 +368,6 @@ const formatFileSLOCIndicators = (fileSLOC, file) => {
   }
 
   return codeSLOCIndicators;
-};
-
-/**
- * Builds HTML data for a table.
- * @param {Object} reportsByFile - The reports grouped by file.
- * @returns {Object} - Returns an object with the table headers and rows.
- */
-const buildTableHtmlData = (reportsByFile) => {
-  const files = Object.keys(reportsByFile);
-
-  const columnsNames = reportsByFile[files[0]][0];
-
-  const tableHeaders = Object
-    .keys(columnsNames)
-    .map(key => `<th scope="col">${key}</th>`).join('\n');
-
-  const buildReportRow = (report) => Object
-    .keys(report)
-    .map(key => `<td>${report[key]}</td>`)
-    .join('\n');
-
-  const buildReportsRows = (fileReports) => fileReports
-    .map((report) => `
-      <tr>
-        ${buildReportRow(report)}
-      </tr>`).join('\n');
-
-  const tableRows = files
-    .map(file => `
-      <tr>
-        <td colspan="2" class="text-center bg-primary-subtle">
-           <strong>${file}</strong>
-        </td>
-      </tr>
-      ${buildReportsRows(reportsByFile[file])}`)
-    .join('\n');
-
-  return({
-    tableHeaders,
-    tableRows,
-  });
-};
-
-/**
- * Format Html Complexity Reports
- * @param {object} summary - The audit summary
- * @param {Array} helpMessages - Help messages about the audit report indicators
- * @param {Object} reportsByFile - The reports grouped by file
- * @returns {string} - The html report
- */
-const formatCodeComplexityHtmlReport = (summary, helpMessages, reportsByFile) => {
-  const {
-    tableHeaders,
-    tableRows,
-  } = buildTableHtmlData(reportsByFile);
-
-  const {
-    average,
-    goodMaintainabilityTotal,
-    moderateMaintainabilityTotal,
-    badMaintainabilityTotal,
-    goodCyclomaticTotal,
-    moderateCyclomaticTotal,
-    badCyclomaticTotal,
-    veryBadCyclomaticTotal,
-  } = summary;
-
-  return `
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Audit Reports</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <style>
-        body {
-          font-family: "Gill Sans", sans-serif;
-          font-size: 0.9rem;
-        }
-
-        h1 {
-           font-size: 2.2rem;
-           text-decoration: underline;
-        }
-
-        h2 {
-           font-size: 2.0rem;
-        }
-
-        h3 {
-           font-size: 1.8rem;
-        }
-
-        h4 {
-           font-size: 1.6rem;
-        }
-        
-        h5 {
-           font-size: 1.4rem;
-        }
-        
-        .modal-body{
-           font-size: 1.1rem;
-        }
-    </style>
-</head>
-<body>
-<h1 class="text-center mb-4 mt-4">Code Complexity Analysis</h1>
-
-<div class="container text-end mt-3 mb-3">
-    <button
-            type="button"
-            class="btn btn-outline-danger border-0"
-            data-bs-toggle="modal"
-            data-bs-target="#helpMessage"
-    >
-        More details about indicators
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
-            <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
-        </svg>
-    </button>
-</div>
-
-<div class="container text-center">
-    <div class="row gx-2">
-
-        <div class="col">
-            <article class="card">
-                <div class="card-body mb-2 mt-2">
-                    <h2 class="card-title text-body-secondary mt-1">Maintainability Summary</h2>
-                    <p class="card-text text-start mt-4">
-                        <span class="text-primary-emphasis">
-                         Average maintainability: <strong>${average?.maintainability || 0}%</strong>
-                        </span>  
-                        <br />                  
-                        <span class="text-primary-emphasis">
-                         Number of files with good maintainability index (>=85 %): <strong>${goodMaintainabilityTotal || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                         Number of files with moderate maintainability index (65–85 %): <strong>${moderateMaintainabilityTotal || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                         Number of files with bad maintainability index (<65 %): <strong>${badMaintainabilityTotal || 0}</strong>
-                        </span>
-                    </p>
-                </div>
-            </article>
-        </div>
-
-        <div class="col">
-            <article class="card">
-                <div class="card-body mb-2 mt-2">
-                    <h2 class="card-title text-body-secondary mt-1">Cyclomatic Complexity Summary</h2>
-                    <p class="card-text text-start mt-4">
-                        <span class="text-primary-emphasis">
-                          Number of files with good Cyclomatic Number (1 to 10): <strong>${goodCyclomaticTotal || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                         Number of files with moderate Cyclomatic Number (10 to 20): <strong>${moderateCyclomaticTotal || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                          Number of files with bad Cyclomatic Number (20 to 40): <strong>${badCyclomaticTotal || 0}</strong>
-                        </span>
-                        <br />
-                        <span class="text-primary-emphasis">
-                          Number of files with very bad Cyclomatic Number (> 40): <strong>${veryBadCyclomaticTotal || 0}</strong>
-                        </span>
-                    </p>
-                </div>
-            </article>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="helpMessage" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="helpModalLabel">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question-fill" viewBox="0 0 16 16">
-                        <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0m1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627"/>
-                    </svg>
-                    <strong>More details about the various indicators</strong>
-                </h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container mb-2 mt-2">
-                   ${helpMessages?.join('<br /><br />') || ''}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container text-left mb-4 mt-4">
-  <div class="text-start">
-    <table class="table table-striped table-responsive caption-top table-bordered border-primary-subtle">
-      <caption>Analysis Details</caption>
-      <thead class="table-light text-uppercase">
-        <tr>
-            ${tableHeaders}
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        ${tableRows}
-      </tbody>
-    </table>
-  </div>
-</div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</body>
-</html>
-    `;
 };
 
 const CodeComplexityConfig = {

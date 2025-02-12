@@ -4,50 +4,9 @@ import AppLogger from '../../commons/AppLogger.js';
 import AuditUtils from '../../commons/AuditUtils.js';
 
 const {
+  codeDuplicationDefaultOptions,
   getFileContent,
 } = AuditUtils;
-
-const defaultOptions = {
-  'mode': 'strict',
-  'threshold': 0,
-  'format': [
-    'javascript',
-    'typescript',
-    'jsx',
-    'tsx'
-  ],
-  'ignore': [
-    '**/node_modules/**',
-    '**/target/**',
-    '**/dist/**',
-    '**/__mocks__/*',
-    '**/mocks/*',
-    '**/.husky/**',
-    '**/.vscode/.*',
-    '**/.idea/**',
-    '**/.gitlab/**',
-    '**/.github/**',
-    '**/eslint-config/**',
-    '**/jest-config/**',
-    '**/tailwind-config/**',
-    '**/typescript-config/**',
-    '**/.eslintrc.**',
-    '**/.gitlab-ci.**',
-    '**/tailwind.**',
-    '**/tsconfig.json',
-    '**/turbo.json',
-    '**/jest.**',
-    '**/__test__/**',
-    '**/**test.**',
-    '**/**.config.**',
-    '**/webpack/**',
-    '**/**webpack**',
-    '**/next**.**',
-    '**/.next/**',
-    'babel',
-    '.*.d.ts.*'
-  ]
-};
 
 /**
  * This asynchronous function starts the audit process.
@@ -68,7 +27,7 @@ const startAudit = async (directory, outputDir, fileFormat) => {
     execSync('npm i -g jscpd@4.0.4', { stdio: 'ignore' });
 
     // execute audit
-    const codeDuplicationCommand = `jscpd --silent --mode "${defaultOptions.mode}" --threshold ${defaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${defaultOptions.format}" --ignore "${defaultOptions.ignore.join(',')}" ${directory}`;
+    const codeDuplicationCommand = `jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
     AppLogger.info(`[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`);
 
     // generate report
