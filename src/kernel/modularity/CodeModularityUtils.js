@@ -2,9 +2,9 @@
  * Module providing utilities for code modularity audits.
  * @module CodeModularityUtils
  */
-
-import path from 'path';
 import fs from 'fs-extra';
+import path from 'path';
+
 import AppLogger from '../../commons/AppLogger.js';
 import CodeModularityConfig from './CodeModularityConfig.js';
 
@@ -16,23 +16,20 @@ import CodeModularityConfig from './CodeModularityConfig.js';
  * @param {Object} options.reports - The detailed results of the Modularity Analysis.
  * @returns {string} - The formatted report content.
  */
-const formatCodeModularityAuditReports = ({
-  fileFormat,
-  reports
-}) => {
-  if(!reports){
-    return '';
-  }
+const formatCodeModularityAuditReports = ({ fileFormat, reports }) => {
+    if (!reports) {
+        return '';
+    }
 
-  if(fileFormat === 'json'){
-    return JSON.stringify(reports, null, 2);
-  }
+    if (fileFormat === 'json') {
+        return JSON.stringify(reports, null, 2);
+    }
 
-  if(fileFormat === 'html'){
-    return CodeModularityConfig.formatCodeModularityHtmlReports(reports);
-  }
+    if (fileFormat === 'html') {
+        return CodeModularityConfig.formatCodeModularityHtmlReports(reports);
+    }
 
-  return ''; // Default to empty string if format is not recognized
+    return ''; // Default to empty string if format is not recognized
 };
 
 /**
@@ -47,90 +44,110 @@ const formatCodeModularityAuditReports = ({
  * @returns {boolean} - `true` if the write operation was successful, `false` otherwise.
  */
 const writeCodeModularityAuditToFile = ({
-  codeModularityOptions,
-  codeModularityAnalysisResult,
+    codeModularityOptions,
+    codeModularityAnalysisResult,
 }) => {
-  try {
-    const {
-      outputDir,
-      fileFormat,
-    } = codeModularityOptions || {};
+    try {
+        const { outputDir, fileFormat } = codeModularityOptions || {};
 
-    AppLogger.info(`[CodeModularityUtils - writeCodeModularityAuditToFile] outputDir:  ${outputDir}`);
-    AppLogger.info(`[CodeModularityUtils - writeCodeModularityAuditToFile] fileFormat:  ${fileFormat}`);
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeModularityAuditToFile] outputDir:  ${outputDir}`,
+        );
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeModularityAuditToFile] fileFormat:  ${fileFormat}`,
+        );
 
-    if(!outputDir?.length){
-      return false;
+        if (!outputDir?.length) {
+            return false;
+        }
+
+        if (!codeModularityAnalysisResult) {
+            return false;
+        }
+
+        const {
+            louvainDetails,
+            density,
+            degreeCentrality,
+            inDegreeCentrality,
+            outDegreeCentrality,
+            svg,
+        } = codeModularityAnalysisResult;
+
+        AppLogger.info('[CodeModularityUtils - startAudit] louvainDetails:', louvainDetails);
+        AppLogger.info('[CodeModularityUtils - startAudit] density:', density);
+        AppLogger.info('[CodeModularityUtils - startAudit] degreeCentrality:', degreeCentrality);
+        AppLogger.info(
+            '[CodeModularityUtils - startAudit] inDegreeCentrality:',
+            inDegreeCentrality,
+        );
+        AppLogger.info(
+            '[CodeModularityUtils - startAudit] outDegreeCentrality:',
+            outDegreeCentrality,
+        );
+
+        const codeModularityAuditOutputFileName = `CodeModularityReport.${fileFormat || 'json'}`;
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeComplexityAuditToFile] codeModularityAuditOutputFileName:  ${codeModularityAuditOutputFileName}`,
+        );
+
+        const codeModularityAuditOutputFile = path.join(
+            outputDir,
+            codeModularityAuditOutputFileName,
+        );
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeComplexityAuditToFile] codeModularityAuditOutputFile:  ${codeModularityAuditOutputFile}`,
+        );
+
+        const svgOutputFileName = 'CodeModularityReport.svg';
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeComplexityAuditToFile] svgOutputFileName:  ${svgOutputFileName}`,
+        );
+
+        const svgOutputFile = path.join(outputDir, svgOutputFileName);
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeComplexityAuditToFile] svgOutputFile:  ${svgOutputFile}`,
+        );
+
+        if (fs.existsSync(codeModularityAuditOutputFile)) {
+            fs.rmSync(codeModularityAuditOutputFile);
+        } else {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const formattedModularityAuditReports = formatCodeModularityAuditReports({
+            fileFormat,
+            reports: {
+                modularity: louvainDetails?.modularity,
+                communities: louvainDetails?.communities,
+                density,
+                degreeCentrality,
+                inDegreeCentrality,
+                outDegreeCentrality,
+                svgFile: svgOutputFileName,
+            },
+        });
+
+        if (!formattedModularityAuditReports?.length) {
+            return false;
+        }
+
+        fs.writeFileSync(codeModularityAuditOutputFile, formattedModularityAuditReports);
+
+        if (svg) {
+            if (fs.existsSync(svgOutputFile)) {
+                fs.rmSync(svgOutputFile);
+            }
+            fs.writeFileSync(svgOutputFile, svg);
+        }
+
+        return true;
+    } catch (error) {
+        AppLogger.info(
+            `[CodeModularityUtils - writeCodeModularityAuditToFile] error:  ${error.message}`,
+        );
+        return false;
     }
-
-    if(!codeModularityAnalysisResult){
-      return false;
-    }
-
-    const {
-      louvainDetails,
-      density,
-      degreeCentrality,
-      inDegreeCentrality,
-      outDegreeCentrality,
-      svg,
-    } = codeModularityAnalysisResult;
-
-    AppLogger.info('[CodeModularityUtils - startAudit] louvainDetails:', louvainDetails);
-    AppLogger.info('[CodeModularityUtils - startAudit] density:', density);
-    AppLogger.info('[CodeModularityUtils - startAudit] degreeCentrality:', degreeCentrality);
-    AppLogger.info('[CodeModularityUtils - startAudit] inDegreeCentrality:', inDegreeCentrality);
-    AppLogger.info('[CodeModularityUtils - startAudit] outDegreeCentrality:', outDegreeCentrality);
-
-    const codeModularityAuditOutputFileName = `CodeModularityReport.${fileFormat || 'json'}`;
-    AppLogger.info(`[CodeModularityUtils - writeCodeComplexityAuditToFile] codeModularityAuditOutputFileName:  ${codeModularityAuditOutputFileName}`);
-
-    const codeModularityAuditOutputFile = path.join(outputDir, codeModularityAuditOutputFileName);
-    AppLogger.info(`[CodeModularityUtils - writeCodeComplexityAuditToFile] codeModularityAuditOutputFile:  ${codeModularityAuditOutputFile}`);
-
-    const svgOutputFileName = 'CodeModularityReport.svg';
-    AppLogger.info(`[CodeModularityUtils - writeCodeComplexityAuditToFile] svgOutputFileName:  ${svgOutputFileName}`);
-
-    const svgOutputFile = path.join(outputDir, svgOutputFileName);
-    AppLogger.info(`[CodeModularityUtils - writeCodeComplexityAuditToFile] svgOutputFile:  ${svgOutputFile}`);
-
-    if(fs.existsSync(codeModularityAuditOutputFile)){
-      fs.rmSync(codeModularityAuditOutputFile);
-    } else {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
-    const formattedModularityAuditReports = formatCodeModularityAuditReports({
-      fileFormat,
-      reports: {
-        modularity: louvainDetails?.modularity,
-        communities: louvainDetails?.communities,
-        density,
-        degreeCentrality,
-        inDegreeCentrality,
-        outDegreeCentrality,
-        svgFile: svgOutputFileName
-      }
-    });
-
-    if(!formattedModularityAuditReports?.length){
-      return false;
-    }
-
-    fs.writeFileSync(codeModularityAuditOutputFile, formattedModularityAuditReports);
-
-    if(svg){
-      if(fs.existsSync(svgOutputFile)){
-        fs.rmSync(svgOutputFile);
-      }
-      fs.writeFileSync(svgOutputFile, svg);
-    }
-
-    return true;
-  } catch (error) {
-    AppLogger.info(`[CodeModularityUtils - writeCodeModularityAuditToFile] error:  ${error.message}`);
-    return false;
-  }
 };
 
 /**
@@ -139,7 +156,7 @@ const writeCodeModularityAuditToFile = ({
  * @property {function} writeCodeModularityAuditToFile - Writes the audit results to a file.
  */
 const CodeModularityUtils = {
-  writeCodeModularityAuditToFile
+    writeCodeModularityAuditToFile,
 };
 
 export default CodeModularityUtils;

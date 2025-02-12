@@ -20,7 +20,8 @@
   "scripts": {
     "scan": "node ./src/index.js",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write src"
   },
   "keywords": [
     "code analysis",
@@ -31,10 +32,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "=9.18.0",
+    "@trivago/prettier-plugin-sort-imports": "=5.2.1",
     "@babel/core": "=7.18.6",
     "@babel/eslint-parser": "=7.24.6",
     "@babel/preset-env": "=7.23.6",
-    "eslint": "=7.5.0 || =8.0.0 || =9.0.0"
+    "eslint": "=9.18.0",
+    "eslint-config-prettier": "=10.0.1",
+    "eslint-plugin-prettier": "=5.2.1",
+    "prettier": "=3.4.2"
   },
   "dependencies": {
     "@typhonjs/babel-parser": "=0.2.0",

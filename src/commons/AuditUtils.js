@@ -1,9 +1,10 @@
-import fs from 'fs-extra';
-import path from 'path';
 import crypto from 'crypto';
+import fs from 'fs-extra';
 import glob from 'globby';
-import unixify from 'unixify';
 import lodash from 'lodash';
+import path from 'path';
+import unixify from 'unixify';
+
 import AppLogger from './AppLogger.js';
 
 /**
@@ -14,9 +15,9 @@ import AppLogger from './AppLogger.js';
  * @property {false} multi - Disallows multiple edges between the same pair of nodes.
  */
 const graphologyDefaultOptions = {
-  type: 'directed',
-  allowSelfLoops: true,
-  multi: false
+    type: 'directed',
+    allowSelfLoops: true,
+    multi: false,
 };
 
 /**
@@ -25,7 +26,7 @@ const graphologyDefaultOptions = {
  * @property {number} resolution - Resolution parameter for the Louvain algorithm (default: 1).
  */
 const louvainDefaultOptions = {
-  resolution: 0.74,
+    resolution: 0.74,
 };
 
 /**
@@ -33,78 +34,68 @@ const louvainDefaultOptions = {
  * @type {{fileExtensions: string[], excludeRegExp: string[]}}
  */
 const madgeDefaultOptions = {
-  fileExtensions: [
-    'ts',
-    'tsx',
-    'js',
-    'jsx'
-  ],
-  excludeRegExp: [
-    '.*node_modules/.*',
-    '.*target/.*',
-    '.*dist/.*',
-    '.*__mocks__/.*',
-    '.*husky/.*',
-    '.*husky/.*',
-    '.*vscode/.*',
-    '.*idea/.*',
-    '.*next/.*',
-    '.*gitlab/.*',
-    '.*github/.*',
-    '.*eslint.*',
-    '.*jest.*',
-    '.*test.*',
-    '.*babel.*',
-    '.*webpack.*',
-    '.*.types.*',
-    '.*.svg',
-    '.*.d.ts.*',
-  ]
+    fileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+    excludeRegExp: [
+        '.*node_modules/.*',
+        '.*target/.*',
+        '.*dist/.*',
+        '.*__mocks__/.*',
+        '.*husky/.*',
+        '.*husky/.*',
+        '.*vscode/.*',
+        '.*idea/.*',
+        '.*next/.*',
+        '.*gitlab/.*',
+        '.*github/.*',
+        '.*eslint.*',
+        '.*jest.*',
+        '.*test.*',
+        '.*babel.*',
+        '.*webpack.*',
+        '.*.types.*',
+        '.*.svg',
+        '.*.d.ts.*',
+    ],
 };
 
 /**
  * Default options for the code duplication analysis.
  * */
 const codeDuplicationDefaultOptions = {
-  'mode': 'strict',
-  'threshold': 0,
-  'format': [
-    'javascript',
-    'typescript',
-    'jsx',
-    'tsx'
-  ],
-  'ignore': [
-    '**/node_modules/**',
-    '**/target/**',
-    '**/dist/**',
-    '**/__mocks__/*',
-    '**/mocks/*',
-    '**/.husky/**',
-    '**/.vscode/.*',
-    '**/.idea/**',
-    '**/.gitlab/**',
-    '**/.github/**',
-    '**/eslint-config/**',
-    '**/jest-config/**',
-    '**/tailwind-config/**',
-    '**/typescript-config/**',
-    '**/.eslintrc.**',
-    '**/.gitlab-ci.**',
-    '**/tailwind.**',
-    '**/tsconfig.json',
-    '**/turbo.json',
-    '**/jest.**',
-    '**/__test__/**',
-    '**/**test.**',
-    '**/**.config.**',
-    '**/webpack/**',
-    '**/**webpack**',
-    '**/next**.**',
-    '**/.next/**',
-    'babel',
-    '.*.d.ts.*'
-  ]
+    mode: 'strict',
+    threshold: 0,
+    format: ['javascript', 'typescript', 'jsx', 'tsx'],
+    ignore: [
+        '**/node_modules/**',
+        '**/target/**',
+        '**/dist/**',
+        '**/__mocks__/*',
+        '**/mocks/*',
+        '**/.husky/**',
+        '**/.vscode/.*',
+        '**/.idea/**',
+        '**/.gitlab/**',
+        '**/.github/**',
+        '**/eslint-config/**',
+        '**/jest-config/**',
+        '**/tailwind-config/**',
+        '**/typescript-config/**',
+        '**/.eslintrc.**',
+        '**/.gitlab-ci.**',
+        '**/tailwind.**',
+        '**/tsconfig.json',
+        '**/turbo.json',
+        '**/jest.**',
+        '**/__test__/**',
+        '**/**test.**',
+        '**/**.config.**',
+        '**/webpack/**',
+        '**/**webpack**',
+        '**/next**.**',
+        '**/.next/**',
+        'babel',
+        '.*.d.ts.*',
+    ],
 };
 
 /**
@@ -112,21 +103,20 @@ const codeDuplicationDefaultOptions = {
  * @param {string} fileName - The name of the file.
  * @returns {boolean} - Returns true if the file is of an accepted type, false otherwise.
  */
-const isAcceptedFileType = (fileName) => (
-  fileName?.endsWith('.js') ||
+const isAcceptedFileType = (fileName) =>
+    fileName?.endsWith('.js') ||
     fileName?.endsWith('.jsx') ||
     fileName?.endsWith('.ts') ||
     fileName?.endsWith('.tsx') ||
-    false
-);
+    false;
 
 /**
  * Checks if a file is excluded.
  * @param {string} filePath - The path of the file.
  * @returns {boolean} - Returns true if the file is excluded, false otherwise.
  */
-const isExcludedFile = (filePath) => (
-  filePath?.toLowerCase()?.includes('snap') ||
+const isExcludedFile = (filePath) =>
+    filePath?.toLowerCase()?.includes('snap') ||
     filePath?.toLowerCase()?.includes('mock') ||
     filePath?.toLowerCase()?.includes('jest') ||
     filePath?.toLowerCase()?.includes('webpack') ||
@@ -151,16 +141,15 @@ const isExcludedFile = (filePath) => (
     filePath?.toLowerCase()?.includes('/js/index.js') ||
     filePath?.toLowerCase()?.includes('/ts/index.ts') ||
     filePath?.toLowerCase()?.includes('test') ||
-    filePath?.toLowerCase()?.includes('spec')  ||
-    filePath?.toLowerCase()?.endsWith('.d.ts')  ||
-    filePath?.toLowerCase()?.endsWith('.config.js')  ||
-    filePath?.toLowerCase()?.endsWith('.config.ts')  ||
+    filePath?.toLowerCase()?.includes('spec') ||
+    filePath?.toLowerCase()?.endsWith('.d.ts') ||
+    filePath?.toLowerCase()?.endsWith('.config.js') ||
+    filePath?.toLowerCase()?.endsWith('.config.ts') ||
     filePath?.toLowerCase()?.includes('/types/') ||
     filePath?.toLowerCase()?.includes('type') ||
     filePath?.toLowerCase()?.includes('index') ||
     filePath?.toLowerCase()?.includes('dico') ||
-    false
-);
+    false;
 
 /**
  * This asynchronous function reads a file and returns its content as a string.
@@ -173,19 +162,20 @@ const isExcludedFile = (filePath) => (
  * print(content); // Logs the content of the file.
  */
 const getFileContent = async (filePath) => {
-  try {
-    const fileStreamReader = fs.createReadStream(filePath);
+    try {
+        const fileStreamReader = fs.createReadStream(filePath);
 
-    const chunks = [];
+        const chunks = [];
 
-    for await (const chunk of fileStreamReader) {
-      chunks.push(Buffer.from(chunk));
+        for await (const chunk of fileStreamReader) {
+            chunks.push(Buffer.from(chunk));
+        }
+
+        return Buffer.concat(chunks)?.toString('utf-8')?.trim();
+    } catch (error) {
+        AppLogger.info(`[AuditUtils - getFileContent] error:  ${error.message}`);
+        return null;
     }
-
-    return Buffer.concat(chunks)?.toString('utf-8')?.trim();
-  } catch (e) {
-    return null;
-  }
 };
 
 /**
@@ -201,16 +191,16 @@ const getFileContent = async (filePath) => {
  * print(result); // Logs true if the file contains the anti-pattern, false otherwise.
  */
 const isNonCompliantFile = async (antiPattern, source) => {
-  try {
-    if (!antiPattern?.length || !source?.length) {
-      return false;
-    }
+    try {
+        if (!antiPattern?.length || !source?.length) {
+            return false;
+        }
 
-    return source?.includes(antiPattern);
-  } catch (error) {
-    AppLogger.info(`[AuditUtils - isNonCompliantFile] error:  ${error.message}`);
-    return false;
-  }
+        return source?.includes(antiPattern);
+    } catch (error) {
+        AppLogger.info(`[AuditUtils - isNonCompliantFile] error:  ${error.message}`);
+        return false;
+    }
 };
 
 /**
@@ -219,49 +209,46 @@ const isNonCompliantFile = async (antiPattern, source) => {
  * @returns {string} - Returns the common base path.
  */
 function findCommonBase(files) {
-  AppLogger.info(`[AuditUtils - findCommonBase] files:  ${files?.length}`);
+    AppLogger.info(`[AuditUtils - findCommonBase] files:  ${files?.length}`);
 
-  if (!files
-        || files.length === 0
-        || files.length === 1) {
-    return '';
-  }
+    if (!files || files.length === 0 || files.length === 1) {
+        return '';
+    }
 
-  const lastSlash = files[0].lastIndexOf(path.sep);
-  AppLogger.info(`[AuditUtils - findCommonBase] lastSlash:  ${lastSlash}`);
+    const lastSlash = files[0].lastIndexOf(path.sep);
+    AppLogger.info(`[AuditUtils - findCommonBase] lastSlash:  ${lastSlash}`);
 
-  if (!lastSlash) {
-    return '';
-  }
+    if (!lastSlash) {
+        return '';
+    }
 
-  const first = files[0].substr(0, lastSlash + 1);
-  AppLogger.info(`[AuditUtils - findCommonBase] first:  ${first}`);
+    const first = files[0].substr(0, lastSlash + 1);
+    AppLogger.info(`[AuditUtils - findCommonBase] first:  ${first}`);
 
-  let prefixlen = first.length;
-  AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+    let prefixlen = first.length;
+    AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
 
-  /**
+    /**
      * Handles the prefixing of a file.
      * @param {string} file - The file to handle.
      */
-  function handleFilePrefixing(file) {
+    function handleFilePrefixing(file) {
+        AppLogger.info(`[AuditUtils - findCommonBase] file:  ${file}`);
 
-    AppLogger.info(`[AuditUtils - findCommonBase] file:  ${file}`);
-
-    for (let i = prefixlen; i > 0; i--) {
-      if (file.substr(0, i) === first.substr(0, i)) {
-        prefixlen = i;
-        return;
-      }
+        for (let i = prefixlen; i > 0; i--) {
+            if (file.substr(0, i) === first.substr(0, i)) {
+                prefixlen = i;
+                return;
+            }
+        }
+        prefixlen = 0;
     }
-    prefixlen = 0;
-  }
 
-  files.forEach(handleFilePrefixing);
+    files.forEach(handleFilePrefixing);
 
-  AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
+    AppLogger.info(`[AuditUtils - findCommonBase] prefixlen:  ${prefixlen}`);
 
-  return first.substr(0, prefixlen);
+    return first.substr(0, prefixlen);
 }
 
 /**
@@ -285,36 +272,30 @@ const patternToFile = (pattern) => glob.sync(unixify(pattern));
  * print(result.basePath); // Logs the base path.
  */
 const getFiles = (srcDir) => {
-  try{
-    AppLogger.info(`[AuditUtils - parseFiles] srcDir:  ${srcDir}`);
+    try {
+        AppLogger.info(`[AuditUtils - parseFiles] srcDir:  ${srcDir}`);
 
-    if (!srcDir || !srcDir.length) {
-      return null;
+        if (!srcDir || !srcDir.length) {
+            return null;
+        }
+
+        const files = lodash.chain([srcDir]).map(patternToFile).flatten().value();
+
+        AppLogger.info(`[AuditUtils - parseFiles] files:  ${files?.length}`);
+
+        const basePath = findCommonBase(files);
+
+        return {
+            files,
+            basePath,
+        };
+    } catch (error) {
+        AppLogger.info(`[AuditUtils - parseFiles] error:  ${error.message}`);
+        return {
+            files: [],
+            basePath: null,
+        };
     }
-
-    const files = lodash
-      .chain([
-        srcDir,
-      ])
-      .map(patternToFile)
-      .flatten()
-      .value();
-
-    AppLogger.info(`[AuditUtils - parseFiles] files:  ${files?.length}`);
-
-    const basePath = findCommonBase(files);
-
-    return ({
-      files,
-      basePath
-    });
-  }catch (error) {
-    AppLogger.info(`[AuditUtils - parseFiles] error:  ${error.message}`);
-    return ({
-      files: [],
-      basePath: null
-    });
-  }
 };
 
 /**
@@ -328,62 +309,63 @@ const getFiles = (srcDir) => {
  * @returns {Object|null} An object containing the file information, or null if the file is excluded or not a JavaScript/TypeScript file.
  */
 const parseFile = (file, basePath, options) => {
-  AppLogger.info(`[AuditUtils - parseFile] file:  ${file}`);
-  AppLogger.info(`[AuditUtils - parseFile] basePath:  ${basePath}`);
-  AppLogger.info(`[AuditUtils - parseFile] options:  ${options}`);
+    AppLogger.info(`[AuditUtils - parseFile] file:  ${file}`);
+    AppLogger.info(`[AuditUtils - parseFile] basePath:  ${basePath}`);
+    AppLogger.info(`[AuditUtils - parseFile] options:  ${options}`);
 
-  const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/ig;
-  const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/ig;
-  const nodeModulesPattern = /node_modules/g;
-  const targetModulesPattern = /target/g;
+    const mockPattern = /.*?(Mock).(js|jsx|ts|tsx)$/gi;
+    const testPattern = /.*?(Test).(js|jsx|ts|tsx)$/gi;
+    const nodeModulesPattern = /node_modules/g;
+    const targetModulesPattern = /target/g;
 
-  if (file && (
-    (options.exclude && file.match(options.exclude)) ||
-        file.match(targetModulesPattern) ||
-        file.match(mockPattern) ||
-        file.match(testPattern) ||
-        file.match(nodeModulesPattern)
-  )) {
-    AppLogger.info(`[AuditUtils - parseFile] excluded file:  ${file}`);
-    return null;
-  }
+    if (
+        file &&
+        ((options.exclude && file.match(options.exclude)) ||
+            file.match(targetModulesPattern) ||
+            file.match(mockPattern) ||
+            file.match(testPattern) ||
+            file.match(nodeModulesPattern))
+    ) {
+        AppLogger.info(`[AuditUtils - parseFile] excluded file:  ${file}`);
+        return null;
+    }
 
-  if (!file.match(/\.(js|jsx|ts|tsx)$/)) {
-    return null;
-  }
+    if (!file.match(/\.(js|jsx|ts|tsx)$/)) {
+        return null;
+    }
 
-  AppLogger.info(`[AuditUtils - parseFile] matched file:  ${file}`);
+    AppLogger.info(`[AuditUtils - parseFile] matched file:  ${file}`);
 
-  const fileShort = file.replace(basePath, '');
-  const fileSafe = fileShort.replace(/[^a-zA-Z0-9]/g, '_');
+    const fileShort = file.replace(basePath, '');
+    const fileSafe = fileShort.replace(/[^a-zA-Z0-9]/g, '_');
 
-  AppLogger.info(`[AuditUtils - parseFile] fileShort:  ${fileShort}`);
-  AppLogger.info(`[AuditUtils - parseFile] fileSafe:  ${fileSafe}`);
+    AppLogger.info(`[AuditUtils - parseFile] fileShort:  ${fileShort}`);
+    AppLogger.info(`[AuditUtils - parseFile] fileSafe:  ${fileSafe}`);
 
-  let source = fs.readFileSync(file).toString();
-  const trimmedSource = source.trim();
+    let source = fs.readFileSync(file).toString();
+    const trimmedSource = source.trim();
 
-  if (!trimmedSource) {
-    return null;
-  }
+    if (!trimmedSource) {
+        return null;
+    }
 
-  // if skip empty line option
-  if (options.noempty) {
-    source = source.replace(/^\s*[\r\n]/gm, '');
-  }
+    // if skip empty line option
+    if (options.noempty) {
+        source = source.replace(/^\s*[\r\n]/gm, '');
+    }
 
-  // if begins with shebang
-  if (source[0] === '#' && source[1] === '!') {
-    source = `//${source}`;
-  }
+    // if begins with shebang
+    if (source[0] === '#' && source[1] === '!') {
+        source = `//${source}`;
+    }
 
-  return ({
-    file,
-    fileSafe,
-    fileShort,
-    source,
-    options,
-  });
+    return {
+        file,
+        fileSafe,
+        fileShort,
+        source,
+        options,
+    };
 };
 
 /**
@@ -392,27 +374,24 @@ const parseFile = (file, basePath, options) => {
  * @returns {string | null}
  */
 const generateHash = (value) => {
-  if(!value){
-    return null;
-  }
-  return crypto
-    .createHash('md5')
-    .update(JSON.stringify(value))
-    .digest('hex');
+    if (!value) {
+        return null;
+    }
+    return crypto.createHash('md5').update(JSON.stringify(value)).digest('hex');
 };
 
 const AuditUtils = {
-  isAcceptedFileType,
-  isExcludedFile,
-  getFiles,
-  generateHash,
-  parseFile,
-  getFileContent,
-  isNonCompliantFile,
-  madgeDefaultOptions,
-  graphologyDefaultOptions,
-  louvainDefaultOptions,
-  codeDuplicationDefaultOptions
+    isAcceptedFileType,
+    isExcludedFile,
+    getFiles,
+    generateHash,
+    parseFile,
+    getFileContent,
+    isNonCompliantFile,
+    madgeDefaultOptions,
+    graphologyDefaultOptions,
+    louvainDefaultOptions,
+    codeDuplicationDefaultOptions,
 };
 
 export default AuditUtils;

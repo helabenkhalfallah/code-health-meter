@@ -7,9 +7,9 @@ import Matcher from '../../commons/Matcher.js';
  * @returns {string} - The html report
  */
 const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
-  const codeComplexityReport = { summary, reports };
+    const codeComplexityReport = { summary, reports };
 
-  return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,10 +21,11 @@ const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
         .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
         .toggle { cursor: pointer; color: blue; text-decoration: underline; }
         .hidden { display: none; }
-        .search { margin-bottom: 10px; padding: 5px; width: 100%; }
+        .search { margin-bottom: 10px; padding: 5px; width: 98%; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
         th { background-color: #f4f4f4; }
+        .help { font-size: 14px; color: gray; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -32,12 +33,14 @@ const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
         <h1>Code Quality Report</h1>
         <div class="section">
             <h2>Summary</h2>
-            <p><strong>Total Physical SLOC:</strong> <span id="total-psloc"></span></p>
-            <p><strong>Total Logical SLOC:</strong> <span id="total-lsloc"></span></p>
-            <p><strong>Total Maintainability:</strong> <span id="total-maintainability"></span></p>
             <p><strong>Average Physical SLOC:</strong> <span id="avg-psloc"></span></p>
             <p><strong>Average Logical SLOC:</strong> <span id="avg-lsloc"></span></p>
             <p><strong>Average Maintainability:</strong> <span id="avg-maintainability"></span></p>
+            
+            <hr>
+            <span class="help">- Physical SLOC: Number of lines in source code (including comment lines and sometimes blank lines).<br></span>
+            <span class="help">- Logical SLOC: Number of lines that will be executed (executable statements).<br></span>
+            <span class="help">- Maintainability: A measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.<br></span>
         </div>
         
         <input type="text" class="search" placeholder="Search files..." id="search">
@@ -52,16 +55,15 @@ const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
         const codeComplexityReport = ${JSON.stringify(codeComplexityReport, null, 2)};
 
         // Fill summary data
-        if (codeComplexityReport?.summary?.total) {
-            document.getElementById("total-psloc").textContent = codeComplexityReport.summary.total.psloc;
-            document.getElementById("total-lsloc").textContent = codeComplexityReport.summary.total.lsloc;
-            document.getElementById("total-maintainability").textContent = codeComplexityReport.summary.total.maintainability.toFixed(2);
-        }
-
         if (codeComplexityReport?.summary?.average) {
             document.getElementById("avg-psloc").textContent = codeComplexityReport.summary.average.psloc;
+            document.getElementById("avg-psloc").textContent += ' physical statements';
+            
             document.getElementById("avg-lsloc").textContent = codeComplexityReport.summary.average.lsloc;
+            document.getElementById("avg-lsloc").textContent += ' logical statements';
+            
             document.getElementById("avg-maintainability").textContent = codeComplexityReport.summary.average.maintainability;
+            document.getElementById("avg-maintainability").textContent += ' %';
         }
 
         // Populate File Reports
@@ -123,114 +125,113 @@ const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
  * @return {*[]}
  */
 const formatHalsteadReports = (halsteadMetrics, file) => {
-  const {
-    bugs,
-    difficulty,
-    effort,
-    length,
-    time,
-    volume,
-  } = halsteadMetrics || {};
+    const { bugs, difficulty, effort, length, time, volume } = halsteadMetrics || {};
 
-  const halsteadReports = [];
+    const halsteadReports = [];
 
-  if (length) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Program Length (N)',
-      description: 'Program Length (N): A higher number indicates a longer and potentially more complex program.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: length,
-      scorePercent: null,
-      scoreUnit: '',
-      file,
-    });
-  }
+    if (length) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Program Length (N)',
+            description:
+                'Program Length (N): A higher number indicates a longer and potentially more complex program.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: length,
+            scorePercent: null,
+            scoreUnit: '',
+            file,
+        });
+    }
 
-  if (volume) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Program Volume (V)',
-      description: 'Program Volume (V): A higher volume means the program contains more information, which can make the program more difficult to understand and maintain.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: volume,
-      scorePercent: null,
-      scoreUnit: 'bit',
-      file,
-    });
-  }
+    if (volume) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Program Volume (V)',
+            description:
+                'Program Volume (V): A higher volume means the program contains more information, which can make the program more difficult to understand and maintain.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: volume,
+            scorePercent: null,
+            scoreUnit: 'bit',
+            file,
+        });
+    }
 
-  if (difficulty) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Difficulty Level (D)',
-      description: 'Difficulty Level (D): A higher difficulty level means the program is more likely to contain errors. A lower number is preferable.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: difficulty,
-      scorePercent: null,
-      scoreUnit: '',
-      file,
-    });
-  }
+    if (difficulty) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Difficulty Level (D)',
+            description:
+                'Difficulty Level (D): A higher difficulty level means the program is more likely to contain errors. A lower number is preferable.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: difficulty,
+            scorePercent: null,
+            scoreUnit: '',
+            file,
+        });
+    }
 
-  if (effort) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Implementation Effort (E) or Understanding',
-      description: 'Implementation Effort (E): A higher effort means the program requires more work to be implemented. A lower number is preferable.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: effort,
-      scorePercent: null,
-      scoreUnit: 'bit',
-      file,
-    });
-  }
+    if (effort) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Implementation Effort (E) or Understanding',
+            description:
+                'Implementation Effort (E): A higher effort means the program requires more work to be implemented. A lower number is preferable.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: effort,
+            scorePercent: null,
+            scoreUnit: 'bit',
+            file,
+        });
+    }
 
-  if (bugs) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Number of estimated bugs in a module or function (B)',
-      description: 'Number of bugs provided (B): A higher number means the program is likely to contain more errors. A lower number is preferable.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: bugs,
-      scorePercent: null,
-      scoreUnit: '',
-      file,
-    });
-  }
+    if (bugs) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Number of estimated bugs in a module or function (B)',
+            description:
+                'Number of bugs provided (B): A higher number means the program is likely to contain more errors. A lower number is preferable.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: bugs,
+            scorePercent: null,
+            scoreUnit: '',
+            file,
+        });
+    }
 
-  if (time) {
-    halsteadReports.push({
-      type: 'code-complexity',
-      category: 'halstead',
-      title: 'Time (T) to implement or understand the program',
-      description: 'Time to implement (T): A longer time means the program takes longer to implement. A lower number is preferable.',
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: time,
-      scorePercent: null,
-      scoreUnit: 's',
-      file,
-    });
-  }
+    if (time) {
+        halsteadReports.push({
+            type: 'code-complexity',
+            category: 'halstead',
+            title: 'Time (T) to implement or understand the program',
+            description:
+                'Time to implement (T): A longer time means the program takes longer to implement. A lower number is preferable.',
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: time,
+            scorePercent: null,
+            scoreUnit: 's',
+            file,
+        });
+    }
 
-  return halsteadReports;
+    return halsteadReports;
 };
 
 /**
@@ -241,18 +242,30 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
  *
  * */
 const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
-  const complexityStatus = Matcher()
-    .on(() => cyclomaticMetric <= 10, () => 'Low risk')
-    .on(() => cyclomaticMetric > 10 && cyclomaticMetric <= 20, () => 'Moderate risk')
-    .on(() => cyclomaticMetric > 20 && cyclomaticMetric <= 40, () => 'High risk')
-    .on(() => cyclomaticMetric > 40, () => 'Most complex and highly unstable')
-    .otherwise(() => '');
+    const complexityStatus = Matcher()
+        .on(
+            () => cyclomaticMetric <= 10,
+            () => 'Low risk',
+        )
+        .on(
+            () => cyclomaticMetric > 10 && cyclomaticMetric <= 20,
+            () => 'Moderate risk',
+        )
+        .on(
+            () => cyclomaticMetric > 20 && cyclomaticMetric <= 40,
+            () => 'High risk',
+        )
+        .on(
+            () => cyclomaticMetric > 40,
+            () => 'Most complex and highly unstable',
+        )
+        .otherwise(() => '');
 
-  return ({
-    type: 'code-complexity',
-    category: 'cyclomatic',
-    title: 'Cyclomatic Complexity',
-    description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).
+    return {
+        type: 'code-complexity',
+        category: 'cyclomatic',
+        title: 'Cyclomatic Complexity',
+        description: `Cyclomatic Complexity corresponds to the number of conditional branches in a program's flowchart (the number of linearly independent paths).
           The larger the cyclomatic number, the more execution paths there will be in the function, and the more difficult it will be to understand and test:
           - If the cyclomatic number is 1 to 10, then the code is structured, well written, highly testable, the cost and effort are less.
           - If the cyclomatic number is 10 to 20, the code is complex and moderately testable, and the cost and effort are medium.
@@ -260,14 +273,14 @@ const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
           - If the cyclomatic number is > 40, it is not testable at all, and the cost and effort are very high.
 
 The cyclomatic complexity report (or McCabe complexity report) presents the cyclomatic complexity (general measure of the solidity and reliability of a program) for the selected project entity.`,
-    status: complexityStatus,
-    scoreMax: 0,
-    scoreMin: 0,
-    score: cyclomaticMetric,
-    scorePercent: null,
-    scoreUnit: '',
-    file,
-  });
+        status: complexityStatus,
+        scoreMax: 0,
+        scoreMin: 0,
+        score: cyclomaticMetric,
+        scorePercent: null,
+        scoreUnit: '',
+        file,
+    };
 };
 
 /**
@@ -277,20 +290,28 @@ The cyclomatic complexity report (or McCabe complexity report) presents the cycl
  * @return {object}
  * */
 const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
-  const maintainabilityStatus = Matcher()
-    .on(() => Math.round(fileMaintainability || 0) < 65, () => 'Low Maintainability')
-    .on(() => Math.round(fileMaintainability || 0) >= 85, () => 'High Maintainability')
-    .on(() => (
-      Math.round(fileMaintainability || 0) >= 65 &&
-          Math.round(fileMaintainability || 0) < 85
-    ), () => 'Moderate Maintainability')
-    .otherwise(() => '');
+    const maintainabilityStatus = Matcher()
+        .on(
+            () => Math.round(fileMaintainability || 0) < 65,
+            () => 'Low Maintainability',
+        )
+        .on(
+            () => Math.round(fileMaintainability || 0) >= 85,
+            () => 'High Maintainability',
+        )
+        .on(
+            () =>
+                Math.round(fileMaintainability || 0) >= 65 &&
+                Math.round(fileMaintainability || 0) < 85,
+            () => 'Moderate Maintainability',
+        )
+        .otherwise(() => '');
 
-  return ({
-    type: 'code-complexity',
-    category: 'maintainability',
-    title: 'Maintainability Index IM (%)',
-    description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.
+    return {
+        type: 'code-complexity',
+        category: 'maintainability',
+        title: 'Maintainability Index IM (%)',
+        description: `The maintainability index is a measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.
     - 85 and above: good maintainability.
     - 65–85: moderate maintainability.
     - < 65: difficult to maintain.
@@ -301,14 +322,14 @@ const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
     - n represents the size of the dictionary.
        
 The maintainability index report presents the maintainability, McCabe and Halstead measures combined for the current project.`,
-    status: maintainabilityStatus,
-    scoreMax: 100,
-    scoreMin: 0,
-    score: null,
-    scorePercent: fileMaintainability,
-    scoreUnit: '%',
-    file,
-  });
+        status: maintainabilityStatus,
+        scoreMax: 100,
+        scoreMin: 0,
+        score: null,
+        scorePercent: fileMaintainability,
+        scoreUnit: '%',
+        file,
+    };
 };
 
 /**
@@ -332,50 +353,50 @@ The maintainability index report presents the maintainability, McCabe and Halste
  * console.log(indicators);
  */
 const formatFileSLOCIndicators = (fileSLOC, file) => {
-  const codeSLOCIndicators = [];
+    const codeSLOCIndicators = [];
 
-  if(fileSLOC && file){
-    codeSLOCIndicators.push({
-      type: 'code-sloc',
-      category: 'physical sloc',
-      title: 'Number of lines in source code (physical SLOC)',
-      description: `Physical SLOC is the total count of lines in the source code file, including comment lines and sometimes blank lines. It gives an idea of the total size of the codebase.
+    if (fileSLOC && file) {
+        codeSLOCIndicators.push({
+            type: 'code-sloc',
+            category: 'physical sloc',
+            title: 'Number of lines in source code (physical SLOC)',
+            description: `Physical SLOC is the total count of lines in the source code file, including comment lines and sometimes blank lines. It gives an idea of the total size of the codebase.
       - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.
       - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: fileSLOC.physical || 0,
-      scorePercent: null,
-      scoreUnit: '',
-      file,
-    });
-    codeSLOCIndicators.push({
-      type: 'code-sloc',
-      category: 'logical sloc',
-      title: 'Number of lines that will be executed (logical SLOC)',
-      description: `Logical SLOC measures the number of executable statements (like operators, functions, etc.) in the source code. It gives an idea of the complexity of the codebase.
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: fileSLOC.physical || 0,
+            scorePercent: null,
+            scoreUnit: '',
+            file,
+        });
+        codeSLOCIndicators.push({
+            type: 'code-sloc',
+            category: 'logical sloc',
+            title: 'Number of lines that will be executed (logical SLOC)',
+            description: `Logical SLOC measures the number of executable statements (like operators, functions, etc.) in the source code. It gives an idea of the complexity of the codebase.
       - High SLOC: A high SLOC count can indicate that a program is large and potentially complex, which could mean it’s harder to maintain. However, a high SLOC count could also simply mean the program is large because it’s doing a lot of things.
       - Low SLOC: A low SLOC count can indicate that a program is small or potentially simplistic. This could mean it’s easier to maintain. However, a low SLOC count could also mean the program isn’t doing much, or it’s not doing it well.`,
-      status: null,
-      scoreMax: 0,
-      scoreMin: 0,
-      score: fileSLOC.logical || 0,
-      scorePercent: null,
-      scoreUnit: '',
-      file,
-    });
-  }
+            status: null,
+            scoreMax: 0,
+            scoreMin: 0,
+            score: fileSLOC.logical || 0,
+            scorePercent: null,
+            scoreUnit: '',
+            file,
+        });
+    }
 
-  return codeSLOCIndicators;
+    return codeSLOCIndicators;
 };
 
 const CodeComplexityConfig = {
-  formatHalsteadReports,
-  formatMaintainabilityIndexReport,
-  formatCyclomaticComplexityReport,
-  formatFileSLOCIndicators,
-  formatCodeComplexityHtmlReport,
+    formatHalsteadReports,
+    formatMaintainabilityIndexReport,
+    formatCyclomaticComplexityReport,
+    formatFileSLOCIndicators,
+    formatCodeComplexityHtmlReport,
 };
 
 export default CodeComplexityConfig;

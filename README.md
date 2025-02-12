@@ -42,6 +42,8 @@ npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path
 
 After execution, you will find all generated reports inside the `outputDir`.
 
+An example of project, json report and html report can be found in the `tests` folder.
+
 ## Contributing
 
 We welcome contributions! Follow these steps to get started:

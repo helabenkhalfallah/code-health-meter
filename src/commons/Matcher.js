@@ -5,8 +5,8 @@
  */
 
 const matched = (value) => ({
-  on: () => matched(value),
-  otherwise: () => value,
+    on: () => matched(value),
+    otherwise: () => value,
 });
 
 /**
@@ -27,8 +27,8 @@ const matched = (value) => ({
  * @return {MatcherReturnType}
  */
 const Matcher = (value = null) => ({
-  on: (predicat, fn) => (predicat(value) ? matched(fn(value)) : Matcher(value)),
-  otherwise: (fn) => fn(value),
+    on: (predicat, fn) => (predicat(value) ? matched(fn(value)) : Matcher(value)),
+    otherwise: (fn) => fn(value),
 });
 
 export default Matcher;

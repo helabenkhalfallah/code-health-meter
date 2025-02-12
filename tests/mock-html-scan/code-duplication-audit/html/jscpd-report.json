@@ -1,0 +1,414 @@
+{
+  "statistics": {
+    "detectionDate": "2025-02-12T11:56:34.676Z",
+    "formats": {
+      "javascript": {
+        "sources": {
+          "./tests/mock-project/pages/write/Write.jsx": {
+            "lines": 26,
+            "tokens": 227,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/settings/Settings.jsx": {
+            "lines": 39,
+            "tokens": 341,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/register/Register.jsx": {
+            "lines": 31,
+            "tokens": 254,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/login/Login.jsx": {
+            "lines": 15,
+            "tokens": 104,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/home/Home.jsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/topbar/TopBar.jsx": {
+            "lines": 8,
+            "tokens": 78,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/singlePost/SinglePost.jsx": {
+            "lines": 48,
+            "tokens": 404,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/sidebar/Sidebar.jsx": {
+            "lines": 0,
+            "tokens": 9,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/posts/Posts.jsx": {
+            "lines": 0,
+            "tokens": 3,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/post/Post.jsx": {
+            "lines": 7,
+            "tokens": 99,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/context/Reducer.js": {
+            "lines": 51,
+            "tokens": 314,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/context/Context.js": {
+            "lines": 31,
+            "tokens": 249,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/context/Actions.js": {
+            "lines": 29,
+            "tokens": 212,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/index.js": {
+            "lines": 13,
+            "tokens": 90,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/App.js": {
+            "lines": 33,
+            "tokens": 362,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 331,
+          "tokens": 2749,
+          "sources": 15,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "jsx": {
+        "sources": {
+          "./tests/mock-project/pages/write/Write.jsx": {
+            "lines": 72,
+            "tokens": 667,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 6,
+            "duplicatedTokens": 56,
+            "percentage": 8.33,
+            "percentageTokens": 8.4,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/single/Single.jsx": {
+            "lines": 12,
+            "tokens": 73,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/settings/Settings.jsx": {
+            "lines": 100,
+            "tokens": 942,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 6,
+            "duplicatedTokens": 56,
+            "percentage": 6,
+            "percentageTokens": 5.94,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/register/Register.jsx": {
+            "lines": 63,
+            "tokens": 559,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/login/Login.jsx": {
+            "lines": 55,
+            "tokens": 471,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/pages/home/Home.jsx": {
+            "lines": 29,
+            "tokens": 254,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/topbar/TopBar.jsx": {
+            "lines": 71,
+            "tokens": 634,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/singlePost/SinglePost.jsx": {
+            "lines": 107,
+            "tokens": 965,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/sidebar/Sidebar.jsx": {
+            "lines": 50,
+            "tokens": 483,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/posts/Posts.jsx": {
+            "lines": 12,
+            "tokens": 89,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/post/Post.jsx": {
+            "lines": 26,
+            "tokens": 284,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "./tests/mock-project/components/header/Header.jsx": {
+            "lines": 17,
+            "tokens": 117,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 614,
+          "tokens": 5538,
+          "sources": 12,
+          "clones": 1,
+          "duplicatedLines": 6,
+          "duplicatedTokens": 56,
+          "percentage": 0.98,
+          "percentageTokens": 1.01,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 945,
+      "tokens": 8287,
+      "sources": 27,
+      "clones": 1,
+      "duplicatedLines": 6,
+      "duplicatedTokens": 56,
+      "percentage": 0.63,
+      "percentageTokens": 0.68,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "jsx",
+      "lines": 7,
+      "fragment": " = filename;\n      try {\n        await axios.post(\"/upload\", data);\n      } catch (err) {}\n    }\n    try {\n      const res = await axios.put",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/mock-project/pages/settings/Settings.jsx",
+        "start": 31,
+        "end": 37,
+        "startLoc": {
+          "line": 31,
+          "column": 11,
+          "position": 330
+        },
+        "endLoc": {
+          "line": 37,
+          "column": 4,
+          "position": 386
+        }
+      },
+      "secondFile": {
+        "name": "tests/mock-project/pages/write/Write.jsx",
+        "start": 24,
+        "end": 30,
+        "startLoc": {
+          "line": 24,
+          "column": 6,
+          "position": 253
+        },
+        "endLoc": {
+          "line": 30,
+          "column": 5,
+          "position": 309
+        }
+      }
+    }
+  ],
+  "filename": "/Users/hela.ben-khalfallah/Desktop/github_workspace/code-health-meter/node_modules/.pnpm/@jscpd+html-reporter@4.0.1/node_modules/@jscpd/html-reporter/dist/templates/main.pug"
+}

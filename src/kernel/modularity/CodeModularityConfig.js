@@ -4,7 +4,7 @@
  * @returns {string}
  */
 const formatCodeModularityHtmlReports = (reports) => {
-  return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -40,8 +40,8 @@ const formatCodeModularityHtmlReports = (reports) => {
 <body>
     <h1>Project Modularity Analysis</h1>
     
+    <h2>Summary</h2>
     <div class="section-container">
-      <h2>Summary</h2>
       <table class="summary-table">
           <tr>
               <th>Metric</th>
@@ -58,13 +58,13 @@ const formatCodeModularityHtmlReports = (reports) => {
       </table>
     </div>
     
-    <h2>Coupling, Centrality and Circular Dependencies Vizualization</h2>
+    <h2>Dependencies Analysis</h2>
     <div class="cyclic-vizualization-container">
       <img class="cyclic-vizualization" src="${reports.svgFile || ''}" alt="Coupling, Centrality and Circular Dependencies Analysis">
     </div>
     
+    <h2>Communities Analysis</h2>
     <div class="section-container">
-      <h2>Communities</h2>
       <input type="text" id="communitySearch" class="search-box" placeholder="Search for a file...">
       <table id="communities-table">
           <tr>
@@ -74,8 +74,17 @@ const formatCodeModularityHtmlReports = (reports) => {
       </table>
     </div>
 
+    <h2>Centrality Analysis</h2>
+    <div class="section-chart-container">
+        <div class="chart-container">
+            <canvas id="degreeCentralityChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="inOutCentralityChart"></canvas>
+        </div>        
+    </div>
+    
     <div class="section-container">
-      <h2>Degree Centrality</h2>
       <input type="text" id="centralitySearch" class="search-box" placeholder="Search for a file...">
       <table id="degree-centrality-table">
           <tr>
@@ -85,15 +94,6 @@ const formatCodeModularityHtmlReports = (reports) => {
               <th>Out-Degree</th>
           </tr>
       </table>
-    </div>
-    
-    <div class="section-chart-container">
-        <div class="chart-container">
-            <canvas id="degreeCentralityChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <canvas id="inOutCentralityChart"></canvas>
-        </div>
     </div>
 
     <script>
@@ -174,7 +174,7 @@ const formatCodeModularityHtmlReports = (reports) => {
 };
 
 const CodeModularityConfig = {
-  formatCodeModularityHtmlReports
+    formatCodeModularityHtmlReports,
 };
 
 export default CodeModularityConfig;

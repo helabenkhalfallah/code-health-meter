@@ -1,12 +1,10 @@
-import fs from 'fs-extra';
 import { execSync } from 'child_process';
+import fs from 'fs-extra';
+
 import AppLogger from '../../commons/AppLogger.js';
 import AuditUtils from '../../commons/AuditUtils.js';
 
-const {
-  codeDuplicationDefaultOptions,
-  getFileContent,
-} = AuditUtils;
+const { codeDuplicationDefaultOptions, getFileContent } = AuditUtils;
 
 /**
  * This asynchronous function starts the audit process.
@@ -17,47 +15,50 @@ const {
  * @throws Will throw an error if the audit process fails.
  */
 const startAudit = async (directory, outputDir, fileFormat) => {
-  try {
+    try {
+        AppLogger.info(`[CodeDuplicationAuditor - startAudit] directory:  ${directory}`);
+        AppLogger.info(`[CodeDuplicationAuditor - startAudit] outputDir:  ${outputDir}`);
+        AppLogger.info(`[CodeDuplicationAuditor - startAudit] fileFormat:  ${fileFormat}`);
 
-    AppLogger.info(`[CodeDuplicationAuditor - startAudit] directory:  ${directory}`);
-    AppLogger.info(`[CodeDuplicationAuditor - startAudit] outputDir:  ${outputDir}`);
-    AppLogger.info(`[CodeDuplicationAuditor - startAudit] fileFormat:  ${fileFormat}`);
+        // add jscpd if not installed
+        execSync('npm i -g jscpd@4.0.4', { stdio: 'ignore' });
 
-    // add jscpd if not installed
-    execSync('npm i -g jscpd@4.0.4', { stdio: 'ignore' });
+        // execute audit
+        const codeDuplicationCommand = `jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
+        AppLogger.info(
+            `[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`,
+        );
 
-    // execute audit
-    const codeDuplicationCommand = `jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
-    AppLogger.info(`[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`);
+        // generate report
+        try {
+            execSync(codeDuplicationCommand, { stdio: 'ignore' });
+        } catch (error) {
+            AppLogger.info(
+                `[CodeDuplicationAuditor - startAudit] execSync error:  ${error.message}`,
+            );
+        }
 
-    // generate report
-    try{
-      execSync(codeDuplicationCommand, { stdio: 'ignore' });
-    }catch (error){
-      AppLogger.info(`[CodeDuplicationAuditor - startAudit] execSync error:  ${error.message}`);
+        // modify generated html
+        if (fileFormat === 'html') {
+            const outputHtmlPath = `${outputDir}/html/index.html`;
+            const outputHtmlContent = await getFileContent(outputHtmlPath);
+            if (outputHtmlContent?.length) {
+                const newOutputHtmlDocument = outputHtmlContent
+                    .replace(/<header.*header>/, '')
+                    .replace(/<footer.*footer>/, '');
+                fs.writeFileSync(outputHtmlPath, newOutputHtmlDocument);
+            }
+        }
+
+        return true;
+    } catch (error) {
+        AppLogger.info(`[CodeDuplicationAuditor - startAudit] error:  ${error.message}`);
+        return false;
     }
-
-    // modify generated html
-    if(fileFormat === 'html'){
-      const outputHtmlPath = `${outputDir}/html/index.html`;
-      const outputHtmlContent = await getFileContent(outputHtmlPath);
-      if(outputHtmlContent?.length){
-        const newOutputHtmlDocument = outputHtmlContent
-          .replace(/<header.*header>/, '')
-          .replace(/<footer.*footer>/, '');
-        fs.writeFileSync(outputHtmlPath, newOutputHtmlDocument);
-      }
-    }
-
-    return true;
-  } catch (error) {
-    AppLogger.info(`[CodeDuplicationAuditor - startAudit] error:  ${error.message}`);
-    return false;
-  }
 };
 
 const CodeDuplicationAuditor = {
-  startAudit,
+    startAudit,
 };
 
 export default CodeDuplicationAuditor;

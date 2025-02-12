@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Quality Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .toggle { cursor: pointer; color: blue; text-decoration: underline; }
+        .hidden { display: none; }
+        .search { margin-bottom: 10px; padding: 5px; width: 98%; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .help { font-size: 14px; color: gray; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Code Quality Report</h1>
+        <div class="section">
+            <h2>Summary</h2>
+            <p><strong>Average Physical SLOC:</strong> <span id="avg-psloc"></span></p>
+            <p><strong>Average Logical SLOC:</strong> <span id="avg-lsloc"></span></p>
+            <p><strong>Average Maintainability:</strong> <span id="avg-maintainability"></span></p>
+            
+            <hr>
+            <span class="help">- Physical SLOC: Number of lines in source code (including comment lines and sometimes blank lines).<br></span>
+            <span class="help">- Logical SLOC: Number of lines that will be executed (executable statements).<br></span>
+            <span class="help">- Maintainability: A measure designed to track maintainability and indicate when it becomes less costly or less risky to rewrite the code instead of modifying it.<br></span>
+        </div>
+        
+        <input type="text" class="search" placeholder="Search files..." id="search">
+        
+        <div class="section">
+            <h2>File Reports</h2>
+            <div id="reports"></div>
+        </div>
+    </div>
+    
+    <script>
+        const codeComplexityReport = {
+  "summary": {
+    "total": {
+      "psloc": 747,
+      "lsloc": 381,
+      "maintainability": 1272.354
+    },
+    "average": {
+      "psloc": 44,
+      "lsloc": 22,
+      "maintainability": "74.84"
+    },
+    "goodMaintainabilityTotal": 3,
+    "goodMaintainabilityFiles": "components/posts/Posts.jsx (86.876)\ncomponents/header/Header.jsx (94.38)\npages/single/Single.jsx (97.227)",
+    "moderateMaintainabilityTotal": 11,
+    "moderateMaintainabilityFiles": "pages/write/Write.jsx (64.744)\npages/login/Login.jsx (64.884)\ncomponents/singlePost/SinglePost.jsx (65.78)\ncontext/Context.js (66.7)\npages/register/Register.jsx (68.281)\ncomponents/topbar/TopBar.jsx (72.972)\npages/home/Home.jsx (75.259)\ncomponents/sidebar/Sidebar.jsx (76.999)\ncontext/Actions.js (77.453)\ncomponents/post/Post.jsx (78.123)\nApp.js (79.286)",
+    "badMaintainabilityTotal": 2,
+    "badMaintainabilityFiles": "context/Reducer.js (54.426)\npages/settings/Settings.jsx (61.99)",
+    "goodCyclomaticTotal": 15,
+    "goodCyclomaticFiles": "context/Reducer.js (9)\npages/settings/Settings.jsx (10)\npages/write/Write.jsx (8)\npages/login/Login.jsx (3)\ncontext/Context.js (4)\npages/register/Register.jsx (8)\ncomponents/topbar/TopBar.jsx (5)\npages/home/Home.jsx (4)\ncomponents/sidebar/Sidebar.jsx (5)\ncontext/Actions.js (8)\ncomponents/post/Post.jsx (4)\nApp.js (6)\ncomponents/posts/Posts.jsx (3)\ncomponents/header/Header.jsx (2)\npages/single/Single.jsx (2)",
+    "moderateCyclomaticTotal": 1,
+    "moderateCyclomaticFiles": "components/singlePost/SinglePost.jsx (14)",
+    "badCyclomaticTotal": 0,
+    "badCyclomaticFiles": "",
+    "veryBadCyclomaticTotal": 0,
+    "veryBadCyclomaticFiles": ""
+  },
+  "reports": {
+    "context/Reducer.js": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "54.43 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "50 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "38 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "9 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "107 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "519.8 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "17.11 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "8894.42 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.17 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "494.13 s"
+      }
+    ],
+    "pages/settings/Settings.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "61.99 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "98 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "65 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "10 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "262 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "1725.26 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "17.08 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "29462.13 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.57 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "1636.79 s"
+      }
+    ],
+    "pages/write/Write.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "64.74 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "71 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "45 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "8 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "189 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "1187.94 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "15.05 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "17877.54 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.4 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "993.2 s"
+      }
+    ],
+    "pages/login/Login.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "64.88 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "53 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "26 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "3 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "99 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "558.74 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "8.18 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "4570.22 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.19 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "253.9 s"
+      }
+    ],
+    "components/singlePost/SinglePost.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "65.78 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "103 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "57 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "14 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "255 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "1638.7 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "20.76 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "34015.39 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.55 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "1889.74 s"
+      }
+    ],
+    "context/Context.js": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "66.7 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "27 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "21 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "4 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "84 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "423.73 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "11 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "4661.02 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.14 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "258.95 s"
+      }
+    ],
+    "pages/register/Register.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "68.28 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "62 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "35 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "8 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "137 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "805.92 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "12.44 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "10029.25 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.27 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "557.18 s"
+      }
+    ],
+    "components/topbar/TopBar.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "72.97 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "70 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "11 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "5 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "71 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "382.86 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "10.6 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "4058.26 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.13 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "225.46 s"
+      }
+    ],
+    "pages/home/Home.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "75.26 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "28 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "15 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "4 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "47 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "218.26 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "8.25 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "1800.65 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.07 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "100.04 s"
+      }
+    ],
+    "components/sidebar/Sidebar.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "77 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "49 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "15 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "5 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "67 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "354.12 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "7.66 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "2712.83 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.12 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "150.71 s"
+      }
+    ],
+    "context/Actions.js": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "77.45 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "24 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "30 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "8 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "66 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "298.56 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "4.03 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "1202.51 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.1 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "66.81 s"
+      }
+    ],
+    "components/post/Post.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "78.12 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "26 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "7 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "4 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "59 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "311.84 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "9 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "2806.55 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.1 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "155.92 s"
+      }
+    ],
+    "App.js": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "79.29 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "32 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "5 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "6 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "26 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "106.27 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "5.6 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "595.13 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.04 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "33.06 s"
+      }
+    ],
+    "components/posts/Posts.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "86.88 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "12 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "5 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "3 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "13 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "44.97 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "4.2 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "188.88 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.01 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "10.49 s"
+      }
+    ],
+    "components/header/Header.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "94.38 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "17 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "2 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "2 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "10 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "33.22 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "1 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "33.22 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0.01 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "1.85 s"
+      }
+    ],
+    "pages/single/Single.jsx": [
+      {
+        "title": "Maintainability Index IM (%)",
+        "score": "97.23 %"
+      },
+      {
+        "title": "Number of lines in source code (physical SLOC)",
+        "score": "12 "
+      },
+      {
+        "title": "Number of lines that will be executed (logical SLOC)",
+        "score": "2 "
+      },
+      {
+        "title": "Cyclomatic Complexity",
+        "score": "2 "
+      },
+      {
+        "title": "Program Length (N)",
+        "score": "4 "
+      },
+      {
+        "title": "Program Volume (V)",
+        "score": "8 bit"
+      },
+      {
+        "title": "Difficulty Level (D)",
+        "score": "1 "
+      },
+      {
+        "title": "Implementation Effort (E) or Understanding",
+        "score": "8 bit"
+      },
+      {
+        "title": "Number of estimated bugs in a module or function (B)",
+        "score": "0 "
+      },
+      {
+        "title": "Time (T) to implement or understand the program",
+        "score": "0.44 s"
+      }
+    ]
+  }
+};
+
+        // Fill summary data
+        if (codeComplexityReport?.summary?.average) {
+            document.getElementById("avg-psloc").textContent = codeComplexityReport.summary.average.psloc;
+            document.getElementById("avg-psloc").textContent += ' physical statements';
+            
+            document.getElementById("avg-lsloc").textContent = codeComplexityReport.summary.average.lsloc;
+            document.getElementById("avg-lsloc").textContent += ' logical statements';
+            
+            document.getElementById("avg-maintainability").textContent = codeComplexityReport.summary.average.maintainability;
+            document.getElementById("avg-maintainability").textContent += ' %';
+        }
+
+        // Populate File Reports
+        if (codeComplexityReport?.reports && Object.keys(codeComplexityReport.reports).length !== 0) {
+            const reportsDiv = document.getElementById("reports");
+
+            Object.entries(codeComplexityReport.reports).forEach(([file, metrics]) => {
+                const fileDiv = document.createElement("div");
+                fileDiv.classList.add("section");
+
+                // Create file header with toggle button
+                const fileHeader = document.createElement("h3");
+                fileHeader.textContent = file;
+                const toggleSpan = document.createElement("span");
+                toggleSpan.className = "toggle";
+                toggleSpan.textContent = "▶ ";
+                fileHeader.prepend(toggleSpan);
+                fileHeader.onclick = function () {
+                    const details = fileDiv.querySelector(".details");
+                    details.classList.toggle("hidden");
+                    this.querySelector(".toggle").textContent = details.classList.contains("hidden") ? "▶" : "▼";
+                };
+                fileDiv.appendChild(fileHeader);
+
+                // Create details section with metrics table
+                const detailsDiv = document.createElement("div");
+                detailsDiv.classList.add("details", "hidden");
+
+                const table = document.createElement("table");
+                table.innerHTML = `<tr><th>Metric</th><th>Score</th></tr>`;
+                metrics.forEach(metric => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `<td>${metric.title}</td><td>${metric.score}</td>`;
+                    table.appendChild(row);
+                });
+                detailsDiv.appendChild(table);
+                fileDiv.appendChild(detailsDiv);
+
+                reportsDiv.appendChild(fileDiv);
+            });
+
+            // Implement Search Feature
+            document.getElementById("search").addEventListener("input", function () {
+                const searchText = this.value.toLowerCase();
+                document.querySelectorAll(".section h3").forEach(h3 => {
+                    h3.parentElement.style.display = h3.textContent.toLowerCase().includes(searchText) ? "block" : "none";
+                });
+            });
+        }
+    </script>
+</body>
+</html>
