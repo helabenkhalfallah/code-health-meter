@@ -13,21 +13,21 @@
 
 **Code Health Meter** is a **powerful and intelligent tool** 🧠 designed to analyze and enhance code quality. It evaluates key software metrics such as:
 
-✅ **Maintainability** 🔄 – How easy the code is to update and extend.  
-✅ **Complexity** 🔍 – Measures the difficulty of understanding and modifying the code.  
-✅ **Duplication** 🔁 – Detects repeated code blocks that can be optimized.  
-✅ **Coupling** 🔗 – Analyzes dependencies between modules to assess modularity.  
+- **Maintainability** 🔄 – How easy the code is to update and extend.  
+- **Complexity** 🔍 – Measures the difficulty of understanding and modifying the code.  
+- **Duplication** 🔁 – Detects repeated code blocks that can be optimized.  
+- **Coupling** 🔗 – Analyzes dependencies between modules to assess modularity.  
 
 By leveraging well-established methodologies, including **Halstead Metrics, Cyclomatic Complexity, Maintainability Index, and Graph-Based Metrics**, this tool helps developers **identify potential risks** ⚠️ and **refactoring opportunities** ✨ in their codebase.
 
 ### 🚀 Key Features:
 
-🔢 **Quantitative Code Quality Analysis** – Uses mathematical models to assess maintainability, difficulty, and potential bugs.  
-📊 **Cyclomatic Complexity Calculation** – Evaluates control flow to determine function complexity.  
-📉 **Maintainability Index Assessment** – Provides insights into how easy the code is to maintain and extend.  
-🔎 **Code Duplication Detection** – Implements the **Rabin–Karp algorithm** to identify redundant code blocks.  
-🧩 **Graph-Based Software Metrics** – Analyzes dependencies and modularity using **Louvain Communities** and centrality measures.  
-📑 **Automated Report Generation** – Outputs results in **JSON and HTML formats** for easy visualization.  
+- **Quantitative Code Quality Analysis** – Uses mathematical models to assess maintainability, difficulty, and potential bugs.  
+- **Cyclomatic Complexity Calculation** – Evaluates control flow to determine function complexity.  
+- **Maintainability Index Assessment** – Provides insights into how easy the code is to maintain and extend.  
+- **Code Duplication Detection** – Implements the **Rabin–Karp algorithm** to identify redundant code blocks.  
+- **Graph-Based Software Metrics** – Analyzes dependencies and modularity using **Louvain Communities** and centrality measures.  
+- **Automated Report Generation** – Outputs results in **JSON and HTML formats** for easy visualization.  
 
 ---
 
