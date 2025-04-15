@@ -1,6 +1,6 @@
 # 📊 Code Health Meter
 
-Presented at React Paris Conference:
+Presented at [React Paris Conference 2025](https://react.paris/#speakers):
 - [Slides](https://docs.google.com/presentation/d/10ycKH7mdlmb-E6F-uFdB8SRe5CEP7hzCdlwP-4UvL0E/edit?usp=sharing).
 - [Youtube](https://www.youtube.com/watch?v=ULTiZDTNeyI).
 
