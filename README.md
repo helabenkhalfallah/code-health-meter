@@ -71,6 +71,8 @@ npm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --form
 - `code-duplication-audit/html/index.html`  
 - Additional styled UI in `styles/` and `js/`
 
+> Note: The included mock-project is a simplified codebase designed to demonstrate the Code Health Meter's analysis pipeline. The original system analyzed in the TOSEM paper contained ~14,000 SLOC across 221 modules and cannot be shared due to size and licensing constraints.
+
 ---
 
 ## 📦 Repository Structure
