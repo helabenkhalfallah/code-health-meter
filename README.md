@@ -1,101 +1,118 @@
 # 📊 Code Health Meter
 
-Presented at [React Paris Conference 2025](https://react.paris/#speakers):
-- [Slides](https://docs.google.com/presentation/d/10ycKH7mdlmb-E6F-uFdB8SRe5CEP7hzCdlwP-4UvL0E/edit?usp=sharing).
-- [Youtube](https://www.youtube.com/watch?v=ULTiZDTNeyI).
-
-## 📖 Table of Contents
-
-1. [📢 Presentation](#-presentation)
-2. [⚙️ Installation and Usage](#️-installation-and-usage)
-3. [🤝 Contributing](#-contributing)
-4. [📜 License](#-license)
+> **TOSEM 2025 Publication**  
+> _Code Health Meter: A Quantitative and Graph-Theoretic Foundation for Automated Code Quality and Architecture Assessment_  
+> 📄 [ACM TOSEM Paper – Coming Soon]
 
 ---
 
-## 📢 Presentation
+## ✨ Overview
 
-**Code Health Meter** is a **powerful and intelligent tool** 🧠 designed to analyze and enhance code quality. It evaluates key software metrics such as:
+**Code Health Meter (CHM)** is a deterministic and modular static analysis framework that produces a formal, reproducible six-dimensional signature for each source module. It integrates complexity theory, duplication detection, and graph-theoretic analysis to quantify maintainability and structural soundness.
 
-- **Maintainability** 🔄 – How easy the code is to update and extend.  
-- **Complexity** 🔍 – Measures the difficulty of understanding and modifying the code.  
-- **Duplication** 🔁 – Detects repeated code blocks that can be optimized.  
-- **Coupling** 🔗 – Analyzes dependencies between modules to assess modularity.  
+The system computes:
 
-By leveraging well-established methodologies, including **Halstead Metrics, Cyclomatic Complexity, Maintainability Index, and Graph-Based Metrics**, this tool helps developers **identify potential risks** ⚠️ and **refactoring opportunities** ✨ in their codebase.
-
-### 🚀 Key Features:
-
-- **Quantitative Code Quality Analysis** – Uses mathematical models to assess maintainability, difficulty, and potential bugs.  
-- **Cyclomatic Complexity Calculation** – Evaluates control flow to determine function complexity.  
-- **Maintainability Index Assessment** – Provides insights into how easy the code is to maintain and extend.  
-- **Code Duplication Detection** – Implements the **Rabin–Karp algorithm** to identify redundant code blocks.  
-- **Graph-Based Software Metrics** – Analyzes dependencies and modularity using **Louvain Communities** and centrality measures.  
-- **Automated Report Generation** – Outputs results in **JSON and HTML formats** for easy visualization.  
+- **Maintainability Index (MI)**: from Halstead metrics, Cyclomatic Complexity, and SLOC.
+- **Cyclomatic Complexity (CC)**: based on control flow graphs.
+- **Duplication Score**: Rabin–Karp fingerprinting via jscpd.
+- **Modularity (Q)**: Louvain community detection.
+- **Centrality**: degree and betweenness metrics on the call graph.
+- **Coupling Metrics**: using static dependency extraction.
 
 ---
 
-## ⚙️ Installation and Usage
+## 📥 Installation
 
-### 📌 Prerequisites
-Before installing **Code Health Meter**, make sure you have the following dependencies installed:
-
-- **Node.js** 🌐 – Required for running the tool.
-- **Graphviz** 📈 – Needed for graph-based analysis. (On macOS, install via `brew install graphviz` or `port install graphviz`)
-
-### 📥 Installation
-Install **Code Health Meter** as a development dependency:
-
-```sh
-npm i -D code-health-meter
+```bash
+npm install -D code-health-meter
 ```
 
-### 🚦 Running the Analysis
-To analyze a project, run:
+### Prerequisites
 
-```sh
-npx code-health-meter --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
+- Node.js ≥ 18.x
+- Graphviz (e.g., `brew install graphviz` or `apt install graphviz`)
+
+---
+
+## 🚦 CLI Usage
+
+Run the tool with:
+
+```bash
+npx code-health-meter   --srcDir "./tests/mock-project"   --outputDir "./tests/output"   --format html
 ```
 
-After execution, you will find all generated reports inside the specified `outputDir`.  
+Supported formats: `html`, `json`, or both.
 
-📂 **Example Reports:** A sample project analysis with JSON and HTML reports is available in the `tests` folder.
+---
+
+## 📊 Reproducing the TOSEM Paper Results
+
+To replicate the analysis presented in the paper:
+
+```bash
+git clone https://github.com/helabenkhalfallah/code-health-meter.git
+cd code-health-meter
+npm install
+npm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html,json
+```
+
+### Output:
+
+📂 `tests/mock-json-scan/`  
+- `code-complexity-audit/CodeComplexityReport.json`  
+- `code-modularity-audit/CodeModularityReport.json`  
+- `code-modularity-audit/CodeModularityReport.svg`  
+- `code-duplication-audit/jscpd-report.json`
+
+📂 `tests/mock-html-scan/`  
+- `code-complexity-audit/CodeComplexityReport.html`  
+- `code-modularity-audit/CodeModularityReport.html`  
+- `code-duplication-audit/html/index.html`  
+- Additional styled UI in `styles/` and `js/`
+
+---
+
+## 📦 Repository Structure
+
+- `src/` – CHM analysis kernel (complexity, modularity, duplication)
+- `cli/` – Command-line interface
+- `tests/mock-project/` – Evaluation system from TOSEM study
+- `tests/mock-json-scan/` – Machine-readable output (JSON, SVG)
+- `tests/mock-html-scan/` – Human-readable dashboard (HTML, CSS)
+
+---
+
+## 📚 Citation
+
+```bibtex
+@article{benkhalfallah2025chm,
+  author    = {Héla Ben Khalfallah},
+  title     = {Code Health Meter: A Quantitative and Graph-Theoretic Foundation for Automated Code Quality and Architecture Assessment},
+  journal   = {ACM Transactions on Software Engineering and Methodology (TOSEM)},
+  year      = {2025},
+  note      = {To appear},
+}
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! 🎉 If you'd like to improve **Code Health Meter**, follow these steps:
+```bash
+git clone https://github.com/helabenkhalfallah/code-health-meter.git
+cd code-health-meter
+npm install
+```
 
-1. **Fork the repository and clone it locally:**
-    ```sh
-    git clone https://github.com/helabenkhalfallah/code-health-meter.git
-    cd code-health-meter
-    ```
+Run:
 
-2. **Install dependencies:**
-    ```sh
-    npm install
-    ```
-
-3. **Run a local analysis:**
-    ```sh
-    npm run scan --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
-    ```
-
-   **Using PNPM?** No problem! 🚀
-    ```sh
-    pnpm scan --srcDir "../../my-path" --outputDir "../../my-output-path" --format "json or html"
-    ```
+```bash
+npm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html,json
+```
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License** 📄. See the [LICENSE](LICENSE) file for details.
-
----
-
-### ❓ Need Help?
-
-💬 If you encounter any issues or have questions, feel free to open an [issue](https://github.com/helabenkhalfallah/code-health-meter/issues) or start a discussion in the repository! 🚀
+Licensed under the MIT License. See the [LICENSE](./LICENSE) file.
