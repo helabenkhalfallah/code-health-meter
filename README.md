@@ -71,7 +71,7 @@ npm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --form
 - `code-duplication-audit/html/index.html`  
 - Additional styled UI in `styles/` and `js/`
 
-> Note: The included mock-project is a simplified codebase designed to demonstrate the Code Health Meter's analysis pipeline. The original system analyzed in the TOSEM paper contained ~14,000 SLOC across 221 modules and cannot be shared due to size and licensing constraints.
+> Note on Scale and Reproducibility: The included tests/mock-project is a simplified version intended for demonstration and functional validation of the Code Health Meter (CHM) framework. The original system evaluated in the TOSEM paper comprises approximately 14,000 lines of JavaScript/TypeScript code across 221 modules. Due to size and licensing constraints, that full system is not distributed as part of this artifact. However, the provided mock-project, along with the structured output reports, fully reproduces the CHM analysis pipeline, including complexity metrics, duplication detection, and graph-based modularity assessments.
 
 ---
 
