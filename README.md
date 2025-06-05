@@ -2,7 +2,7 @@
 
 > **TOSEM 2025 Publication**  
 > _Code Health Meter: A Quantitative and Graph-Theoretic Foundation for Automated Code Quality and Architecture Assessment_  
-> 📄 [ACM TOSEM Paper – Coming Soon]
+> 📄 [ACM TOSEM Paper](https://dl.acm.org/doi/10.1145/3737670)
 
 ---
 
