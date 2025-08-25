@@ -1,6 +1,6 @@
 {
   "name": "code-health-meter",
-  "version": "4.1.O",
+  "version": "4.1.1",
   "description": "",
   "main": "src/index.js",
   "type": "module",
