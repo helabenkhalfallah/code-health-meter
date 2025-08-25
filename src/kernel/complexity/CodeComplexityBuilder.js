@@ -1,85 +1,44 @@
 import AppLogger from '../../commons/AppLogger.js';
 import { buildMetricById } from './CodeComplexityMetrics.js';
 
-/**
- * String identifiers for per-file metrics available in the composer.
- * @typedef {'mi'|'sloc'|'cyclo'|'hal'} MetricId
- */
-
-/**
- * A single analyzed file entry produced upstream (e.g., inspectDirectory()).
- * @typedef {Object} FileComplexityItem
- * @property {string} file
- * @property {number} fileMaintainability
- * @property {{ cyclomatic?: number, halstead?: Record<string, any> }} fileComplexity
- * @property {{ physical?: number, logical?: number }} fileSLOC
- */
-
-/**
- * A single formatted metric report entry (as produced by CodeComplexityConfig formatters).
- * @typedef {Object} MetricReport
- * @property {string} title
- * @property {string} file
- * @property {number} [score]
- * @property {number} [scorePercent]
- * @property {string} [scoreUnit]
- */
+/** JSDoc type imports for editors/IDE (still plain JS). */
+/** @typedef {import('./CodeComplexityMetrics.js').AnalyzedFileEntry} AnalyzedFileEntry */
+/** @typedef {import('./CodeComplexityMetrics.js').MetricReport} MetricReport */
+/** @typedef {import('./CodeComplexityMetrics.js').MetricId} MetricId */
 
 /** Titles used by buildAuditStats to categorize reports. */
-export const REPORT_TITLES = {
+export const REPORT_TITLES = Object.freeze({
     cyclomatic: 'Cyclomatic Complexity',
     mi: 'Maintainability Index IM (%)',
-};
+});
 
 /**
- * Compose reports for the selected metric ids in a single pass over the same `files` array.
- * Keeps things fast while each metric remains independently reusable.
- *
- * @param {FileComplexityItem[]} files - Precomputed file entries (no IO here).
- * @param {MetricId[]} [metricIds=['mi','sloc','cyclo','hal']] - Metrics to include.
- * @returns {MetricReport[]} Concatenated metric reports.
- *
- * @example
- * // Just MI + Cyclomatic
- * const reports = composeComplexityReports(files, ['mi','cyclo']);
+ * Compose reports for selected metric ids over the same analyzed entries array.
+ * @param {AnalyzedFileEntry[]} entries - From `inspectDirectory()`
+ * @param {MetricId[]} [metricIds=['mi','sloc','cyclo','hal']]
+ * @returns {MetricReport[]} concatenated metric reports
  */
-export function composeComplexityReports(files, metricIds = ['mi', 'sloc', 'cyclo', 'hal']) {
+export function composeComplexityReports(entries, metricIds = ['mi', 'sloc', 'cyclo', 'hal']) {
     /** @type {MetricReport[]} */
     const reports = [];
     const ids =
         Array.isArray(metricIds) && metricIds.length ? metricIds : ['mi', 'sloc', 'cyclo', 'hal'];
-
     for (const id of ids) {
         const fn = buildMetricById(id);
         if (!fn) {
             AppLogger.info(`[composeComplexityReports] Unknown metric id: ${id}`);
             continue;
         }
-        reports.push(...(fn(files) || []));
+        reports.push(...(fn(entries) || []));
     }
     return reports;
 }
 
 /**
  * Aggregate audit statistics from a mixed set of metric reports.
- *
- * Recognized titles (from `CodeComplexityConfig` formatters):
- * - {@link REPORT_TITLES.cyclomatic} → uses `report.score` as the cyclomatic value
- * - {@link REPORT_TITLES.mi} → uses `report.scorePercent` as the MI value
- *
- * Thresholds for Maintainability Index:
- * - < 65: difficult to maintain
- * - 65–85: moderate
- * - ≥ 85: good
- *
- * Cyclomatic categories:
- * - good:      1–10
- * - moderate:  11–20
- * - bad:       21–40
- * - very bad:  >40
- *
+ * Recognized titles: REPORT_TITLES.cyclomatic, REPORT_TITLES.mi
  * @param {MetricReport[]} reports
- * @returns {Object} Categorized counts and newline-joined file lists.
+ * @returns {Object} categorized counts and newline-joined file lists
  */
 export const buildAuditStats = (reports) => {
     if (!reports) return {};
@@ -148,30 +107,26 @@ export const buildAuditStats = (reports) => {
 };
 
 /**
- * Build the combined (full) report while still using the per-metric builders.
- * You can pass any `summaryBase` you already have (e.g., SLOC/MI aggregates from escomplex);
- * categorized stats derived from composed reports are appended.
+ * Build the combined (full) report using per-metric builders.
+ * Backwards-compatible: accepts `params.entries` (preferred) or legacy `params.files`.
  *
  * @param {Object} params
- * @param {FileComplexityItem[]} params.files
- * @param {MetricId[]} [params.metricIds=['mi','sloc','cyclo','hal']] - Metrics to include.
- * @param {Object} [params.summaryBase] - Existing summary fields to keep (psloc/lsloc/MI averages, etc.).
- * @param {(reports: MetricReport[]) => Object} [params.buildAuditStats] - Derives counts/lists from reports.
- * @returns {{ summary: Object, auditReports: MetricReport[] }} Combined summary and all report entries.
- *
- * @example
- * const { summary, auditReports } = buildFullComplexityReport({
- *   files,
- *   metricIds: ['mi','sloc','cyclo','hal'],
- *   summaryBase,
- *   buildAuditStats,
- * });
+ * @param {AnalyzedFileEntry[]} [params.entries] - Preferred analyzed entries.
+ * @param {AnalyzedFileEntry[]} [params.files]   - Legacy alias for entries.
+ * @param {MetricId[]} [params.metricIds=['mi','sloc','cyclo','hal']]
+ * @param {Object} [params.summaryBase] - Existing summary fields (psloc/lsloc/MI averages, etc.)
+ * @param {(reports: MetricReport[]) => Object} [params.buildAuditStats] - Derives counts/lists
+ * @returns {{ summary: Object, auditReports: MetricReport[] }}
  */
-export function buildFullComplexityReport({ files, metricIds, summaryBase = {}, buildAuditStats }) {
-    const auditReports = composeComplexityReports(files, metricIds);
+export function buildFullComplexityReport({
+    entries,
+    files,
+    metricIds,
+    summaryBase = {},
+    buildAuditStats,
+}) {
+    const analyzed = entries ?? files ?? [];
+    const auditReports = composeComplexityReports(analyzed, metricIds);
     const stats = buildAuditStats ? buildAuditStats(auditReports) : {};
-    return {
-        summary: { ...summaryBase, ...stats },
-        auditReports,
-    };
+    return { summary: { ...summaryBase, ...stats }, auditReports };
 }

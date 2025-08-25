@@ -7,50 +7,46 @@ import {
 
 /**
  * Code Complexity Metrics — standalone per-metric builders.
- * Each function consumes precomputed file entries (no IO), so they’re safe to use
- * independently or inside a larger one-pass pipeline.
- *
+ * Each function consumes analyzed entries produced by `inspectDirectory()` (no I/O).
  * @module CodeComplexityMetrics
  */
 
 /**
- * String identifiers for per-file metrics available from this module.
+ * String identifiers for per-file metrics.
  * @typedef {'mi'|'sloc'|'cyclo'|'hal'} MetricId
  */
 
 /**
- * A single analyzed file entry produced upstream (e.g., inspectDirectory()).
- * @typedef {Object} FileComplexityItem
+ * A single analyzed entry produced by `inspectDirectory()`.
+ * @typedef {Object} AnalyzedFileEntry
  * @property {string} file
  * @property {number} fileMaintainability
- * @property {{ cyclomatic?: number, halstead?: Record<string, any> }} fileComplexity
+ * @property {{ cyclomatic?: number, halstead?: Object }} fileComplexity
  * @property {{ physical?: number, logical?: number }} fileSLOC
  */
 
+/** Legacy alias kept for compatibility. */
+/** @typedef {AnalyzedFileEntry} FileComplexityItem */
+
 /**
- * A single formatted metric report entry (as produced by CodeComplexityConfig formatters).
+ * A single formatted metric report entry (as produced by formatters in CodeComplexityConfig).
  * @typedef {Object} MetricReport
  * @property {string} title
  * @property {string} file
- * @property {number} [score]
- * @property {number} [scorePercent]
- * @property {string} [scoreUnit]
+ * @property {number=} score
+ * @property {number=} scorePercent
+ * @property {string=} scoreUnit
  */
 
 /**
- * Build Maintainability Index reports for a list of files.
- * Standalone & reusable; no filesystem access.
- *
- * @param {FileComplexityItem[]} [files=[]]
+ * Build Maintainability Index reports for analyzed entries.
+ * @param {AnalyzedFileEntry[]} [entries=[]]
  * @returns {MetricReport[]}
- *
- * @example
- * const reports = buildMaintainabilityReports(files);
  */
-export function buildMaintainabilityReports(files = []) {
+export function buildMaintainabilityReports(entries = []) {
     /** @type {MetricReport[]} */
     const out = [];
-    for (const item of files) {
+    for (const item of entries) {
         const { file, fileMaintainability } = item || {};
         if (!file) continue;
         out.push(formatMaintainabilityIndexReport(fileMaintainability, file));
@@ -59,18 +55,14 @@ export function buildMaintainabilityReports(files = []) {
 }
 
 /**
- * Build SLOC indicator reports (physical/logical) for a list of files.
- *
- * @param {FileComplexityItem[]} [files=[]]
+ * Build SLOC indicator reports (physical/logical).
+ * @param {AnalyzedFileEntry[]} [entries=[]]
  * @returns {MetricReport[]}
- *
- * @example
- * const reports = buildSLOCReports(files);
  */
-export function buildSLOCReports(files = []) {
+export function buildSLOCReports(entries = []) {
     /** @type {MetricReport[]} */
     const out = [];
-    for (const item of files) {
+    for (const item of entries) {
         const { file, fileSLOC } = item || {};
         if (!file) continue;
         out.push(...formatFileSLOCIndicators(fileSLOC, file));
@@ -79,18 +71,14 @@ export function buildSLOCReports(files = []) {
 }
 
 /**
- * Build Cyclomatic Complexity reports for a list of files.
- *
- * @param {FileComplexityItem[]} [files=[]]
+ * Build Cyclomatic Complexity reports.
+ * @param {AnalyzedFileEntry[]} [entries=[]]
  * @returns {MetricReport[]}
- *
- * @example
- * const reports = buildCyclomaticReports(files);
  */
-export function buildCyclomaticReports(files = []) {
+export function buildCyclomaticReports(entries = []) {
     /** @type {MetricReport[]} */
     const out = [];
-    for (const item of files) {
+    for (const item of entries) {
         const { file, fileComplexity } = item || {};
         if (!file) continue;
         const { cyclomatic } = fileComplexity || {};
@@ -100,18 +88,14 @@ export function buildCyclomaticReports(files = []) {
 }
 
 /**
- * Build Halstead metric reports for a list of files.
- *
- * @param {FileComplexityItem[]} [files=[]]
+ * Build Halstead metric reports.
+ * @param {AnalyzedFileEntry[]} [entries=[]]
  * @returns {MetricReport[]}
- *
- * @example
- * const reports = buildHalsteadMetricReports(files);
  */
-export function buildHalsteadMetricReports(files = []) {
+export function buildHalsteadMetricReports(entries = []) {
     /** @type {MetricReport[]} */
     const out = [];
-    for (const item of files) {
+    for (const item of entries) {
         const { file, fileComplexity } = item || {};
         if (!file) continue;
         const { halstead } = fileComplexity || {};
@@ -121,14 +105,9 @@ export function buildHalsteadMetricReports(files = []) {
 }
 
 /**
- * Lookup a per-metric builder function by its id.
- *
- * @param {MetricId} id - One of 'mi' | 'sloc' | 'cyclo' | 'hal'.
- * @returns {(files: FileComplexityItem[]) => MetricReport[] | undefined} Builder function, or `undefined` if unknown.
- *
- * @example
- * const build = buildMetricById('cyclo');
- * const reports = build ? build(files) : [];
+ * Lookup a per-metric builder function by id.
+ * @param {MetricId} id - 'mi' | 'sloc' | 'cyclo' | 'hal'
+ * @returns {(entries: AnalyzedFileEntry[]) => MetricReport[] | undefined}
  */
 export const buildMetricById = (id) =>
     ({
