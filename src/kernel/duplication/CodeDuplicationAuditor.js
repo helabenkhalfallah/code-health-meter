@@ -20,11 +20,8 @@ const startAudit = async (directory, outputDir, fileFormat) => {
         AppLogger.info(`[CodeDuplicationAuditor - startAudit] outputDir:  ${outputDir}`);
         AppLogger.info(`[CodeDuplicationAuditor - startAudit] fileFormat:  ${fileFormat}`);
 
-        // add jscpd if not installed
-        execSync('npm i -g jscpd@4.0.4', { stdio: 'ignore' });
-
         // execute audit
-        const codeDuplicationCommand = `jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
+        const codeDuplicationCommand = `pnpm jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
         AppLogger.info(
             `[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`,
         );

@@ -54,7 +54,7 @@
     "graphology-components": "=1.5.4",
     "graphology-metrics": "=2.3.1",
     "graphology-svg": "=0.1.3",
-    "jscpd": "=4.0.4",
+    "jscpd": "=4.0.5",
     "jsinspect": "=0.12.7",
     "lodash": "=4.17.21",
     "madge": "=7.0.0",
