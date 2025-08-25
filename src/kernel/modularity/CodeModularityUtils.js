@@ -4,19 +4,76 @@
  */
 import fs from 'fs-extra';
 import path from 'path';
+import xml2js from 'xml2js';
 
 import AppLogger from '../../commons/AppLogger.js';
 import CodeModularityConfig from './CodeModularityConfig.js';
 
 /**
+ * @typedef {Object} CodeModularityOptions
+ * @property {string} outputDir - Output directory for the report files.
+ * @property {('json'|'html')} fileFormat - Desired output format.
+ */
+
+/**
+ * @typedef {Object} NumberByNode
+ * @property {number} [key] - Numeric value by node id (index signature for docs only).
+ */
+
+/**
+ * @typedef {Object} CentralityMaps
+ * @property {Record<string, number>} degreeCentrality - Degree centrality per node.
+ * @property {Record<string, number>} inDegreeCentrality - In-degree centrality per node.
+ * @property {Record<string, number>} outDegreeCentrality - Out-degree centrality per node.
+ */
+
+/**
+ * @typedef {Object} DensityResult
+ * @property {number} density - Graph density in [0,1].
+ */
+
+/**
+ * @typedef {Object} LouvainDetails
+ * @property {number} [modularity] - Louvain modularity score.
+ * @property {any} [communities] - Community assignment details (library-specific shape).
+ * @property {Record<string, number>} [partition] - Optional mapping node -> community id.
+ */
+
+/**
+ * @typedef {Object} DirectoryTreeBuildResult
+ * @property {Record<string, string[]>} tree - Adjacency object from Madge (module -> deps).
+ * @property {Buffer|string} treeVisualization - SVG output from Madge.
+ * @property {string[]} warnings - Madge warnings.
+ * @property {string[][]} circular - List of circular dependency paths.
+ * @property {any} circularGraph - Graph representation of cycles (Madge-specific).
+ * @property {string[]} orphans - Modules without dependents.
+ * @property {string[]} leaves - Leaf modules.
+ */
+
+/**
+ * @typedef {Object} DirectoryTreeNormalized
+ * @property {string[]} nodes - List of node ids.
+ * @property {Array<[string,string]>} edges - Directed edges [source, target].
+ */
+
+/**
+ * XML to JavaScript parser instance.
+ * @const {xml2js.Parser}
+ */
+const xml2jsParser = new xml2js.Parser({});
+
+/**
  * Formats the code modularity audit reports based on the specified file format.
+ *
  * @function formatCodeModularityAuditReports
  * @param {Object} options - Options for formatting.
- * @param {string} options.fileFormat - The desired output file format ('json' or 'html').
+ * @param {('json'|'html')} options.fileFormat - The desired output file format.
  * @param {Object} options.reports - The detailed results of the Modularity Analysis.
- * @returns {string} - The formatted report content.
+ * @returns {string} The formatted report content.
+ * @example
+ * const text = formatCodeModularityAuditReports({ fileFormat: 'json', reports: { density: 0.2 } });
  */
-const formatCodeModularityAuditReports = ({ fileFormat, reports }) => {
+export const formatCodeModularityAuditReports = ({ fileFormat, reports }) => {
     if (!reports) {
         return '';
     }
@@ -29,21 +86,30 @@ const formatCodeModularityAuditReports = ({ fileFormat, reports }) => {
         return CodeModularityConfig.formatCodeModularityHtmlReports(reports);
     }
 
-    return ''; // Default to empty string if format is not recognized
+    return '';
 };
 
 /**
  * Writes the code modularity audit results to a file.
+ *
  * @function writeCodeModularityAuditToFile
  * @param {Object} options - Options for writing the audit results.
- * @param {Object} options.codeModularityOptions - Code modularity audit options.
- * @param {string} options.codeModularityOptions.outputDir - The output directory for the report.
- * @param {string} options.codeModularityOptions.fileFormat - The desired output file format.
- * @param {Object} options.codeModularityAnalysisResult - The results of the code modularity analysis.
- * @param {Object} options.codeModularityAnalysisResult.louvainDetails - Louvain details.
- * @returns {boolean} - `true` if the write operation was successful, `false` otherwise.
+ * @param {CodeModularityOptions} options.codeModularityOptions - Code modularity audit options.
+ * @param {Object} options.codeModularityAnalysisResult - Results of the code modularity analysis.
+ * @param {LouvainDetails} options.codeModularityAnalysisResult.louvainDetails - Louvain details.
+ * @param {DensityResult|Object} options.codeModularityAnalysisResult.density - Density result.
+ * @param {CentralityMaps|Object} options.codeModularityAnalysisResult.degreeCentrality - Degree map.
+ * @param {CentralityMaps|Object} options.codeModularityAnalysisResult.inDegreeCentrality - In-degree map.
+ * @param {CentralityMaps|Object} options.codeModularityAnalysisResult.outDegreeCentrality - Out-degree map.
+ * @param {string|Buffer} [options.codeModularityAnalysisResult.svg] - Optional SVG string to persist.
+ * @returns {boolean} `true` if the write operation was successful, `false` otherwise.
+ * @example
+ * writeCodeModularityAuditToFile({
+ *   codeModularityOptions: { outputDir: 'out', fileFormat: 'json' },
+ *   codeModularityAnalysisResult: { louvainDetails: { modularity: 0.5 } }
+ * });
  */
-const writeCodeModularityAuditToFile = ({
+export const writeCodeModularityAuditToFile = ({
     codeModularityOptions,
     codeModularityAnalysisResult,
 }) => {
@@ -151,12 +217,70 @@ const writeCodeModularityAuditToFile = ({
 };
 
 /**
- * The CodeModularityUtils object containing utility functions for code modularity audits.
- * @const {Object} CodeModularityUtils
- * @property {function} writeCodeModularityAuditToFile - Writes the audit results to a file.
+ * Parse Madge SVG output and extract node labels with their x/y positions.
+ *
+ * **Note:** This is optional and may be brittle across Madge versions as layout details change.
+ *
+ * @param {Buffer|string} svgBuffer - SVG buffer or string produced by Madge.
+ * @returns {Array<{title: string, x: number, y: number}>|null} List of labeled positions or `null` on failure.
  */
-const CodeModularityUtils = {
-    writeCodeModularityAuditToFile,
+export const retrieveDirectoryTreeData = async (svgBuffer) => {
+    try {
+        const svgContent = svgBuffer.toString();
+        const result = await xml2jsParser.parseStringPromise(svgContent);
+        const svg = result.svg;
+
+        const svgData = [];
+        const nodes = svg.g[0].g;
+
+        for (const node of nodes) {
+            const title = node.title?.[0];
+            if (!title?.length) {
+                continue;
+            }
+
+            const textNode = node.text?.[0]?.$;
+            if (!textNode) {
+                continue;
+            }
+
+            let x = 0;
+            let y = 0;
+
+            if (textNode) {
+                x = parseFloat(textNode.x);
+                y = parseFloat(textNode.y);
+            }
+
+            svgData.push({ title, x, y });
+        }
+
+        return svgData;
+    } catch (error) {
+        AppLogger.error('Error parsing SVG content:', error);
+        return null;
+    }
 };
 
-export default CodeModularityUtils;
+/**
+ * Normalize a Madge adjacency object into a flat list of nodes and directed edges.
+ *
+ * @param {Record<string, string[]>} tree - Madge object() output.
+ * @returns {DirectoryTreeNormalized} Normalized nodes and edges.
+ */
+export const normalizeDirectoryTree = (tree) => {
+    if (Object.keys(tree).length === 0) {
+        return {
+            nodes: [],
+            edges: [],
+        };
+    }
+
+    return Object.keys(tree).reduce((acc, node) => {
+        return {
+            ...acc,
+            nodes: [...(acc.nodes || []), node],
+            edges: [...(acc.edges || []), ...(tree[node]?.map((child) => [node, child]) || [])],
+        };
+    }, {});
+};

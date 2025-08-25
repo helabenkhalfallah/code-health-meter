@@ -4,11 +4,11 @@ import fs from 'fs-extra';
 import { parseArgs } from 'node:util';
 
 import AppLogger from './commons/AppLogger.js';
-import CodeComplexityAuditor from './kernel/complexity/CodeComplexityAuditor.js';
-import CodeComplexityUtils from './kernel/complexity/CodeComplexityUtils.js';
-import CodeDuplicationAuditor from './kernel/duplication/CodeDuplicationAuditor.js';
-import CodeModularityAuditor from './kernel/modularity/CodeModularityAuditor.js';
-import CodeModularityUtils from './kernel/modularity/CodeModularityUtils.js';
+import { startComplexityAudit } from './kernel/complexity/CodeComplexityAuditor.js';
+import { writeCodeComplexityAuditToFile } from './kernel/complexity/CodeComplexityUtils.js';
+import { startDuplicationAudit } from './kernel/duplication/CodeDuplicationAuditor.js';
+import { startModularityAudit } from './kernel/modularity/CodeModularityAuditor.js';
+import { writeCodeModularityAuditToFile } from './kernel/modularity/CodeModularityUtils.js';
 
 /**
  * Parses command line arguments.
@@ -62,7 +62,7 @@ if (fs.existsSync(outputDir)) {
  * Starts the code complexity audit.
  * @type {Object}
  */
-const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(srcDir, {
+const codeComplexityAnalysisResult = await startComplexityAudit(srcDir, {
     exclude: null,
     noempty: true,
     quiet: true,
@@ -72,7 +72,7 @@ const codeComplexityAnalysisResult = await CodeComplexityAuditor.startAudit(srcD
 /**
  * Writes the audit result to files.
  */
-CodeComplexityUtils.writeCodeComplexityAuditToFile({
+writeCodeComplexityAuditToFile({
     codeComplexityOptions: {
         outputDir: `${outputDir}/code-complexity-audit`,
         fileFormat: format, // html or json
@@ -84,19 +84,19 @@ CodeComplexityUtils.writeCodeComplexityAuditToFile({
  * Starts the code duplication audit.
  * @type {Object}
  */
-await CodeDuplicationAuditor.startAudit(srcDir, `${outputDir}/code-duplication-audit`, format);
+await startDuplicationAudit(srcDir, `${outputDir}/code-duplication-audit`, format);
 
 /**
  * Starts the code modularity audit.
  * https://github.com/pahen/madge?tab=readme-ov-file#configuration
  * @type {Object}
  */
-const codeModularityAnalysisResult = await CodeModularityAuditor.startAudit(srcDir);
+const codeModularityAnalysisResult = await startModularityAudit(srcDir);
 
 /**
  * Writes the audit result to files.
  */
-CodeModularityUtils.writeCodeModularityAuditToFile({
+writeCodeModularityAuditToFile({
     codeModularityOptions: {
         outputDir: `${outputDir}/code-modularity-audit`,
         fileFormat: format, // html or json

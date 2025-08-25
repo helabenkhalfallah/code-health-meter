@@ -2,9 +2,7 @@ import { execSync } from 'child_process';
 import fs from 'fs-extra';
 
 import AppLogger from '../../commons/AppLogger.js';
-import AuditUtils from '../../commons/AuditUtils.js';
-
-const { codeDuplicationDefaultOptions, getFileContent } = AuditUtils;
+import { codeDuplicationDefaultOptions, getFileContent } from '../../commons/AuditUtils.js';
 
 /**
  * This asynchronous function starts the audit process.
@@ -14,16 +12,18 @@ const { codeDuplicationDefaultOptions, getFileContent } = AuditUtils;
  * @returns {Promise<boolean>} A promise that resolves to `true` if the audit was successful, and `false` otherwise.
  * @throws Will throw an error if the audit process fails.
  */
-const startAudit = async (directory, outputDir, fileFormat) => {
+export const startDuplicationAudit = async (directory, outputDir, fileFormat) => {
     try {
-        AppLogger.info(`[CodeDuplicationAuditor - startAudit] directory:  ${directory}`);
-        AppLogger.info(`[CodeDuplicationAuditor - startAudit] outputDir:  ${outputDir}`);
-        AppLogger.info(`[CodeDuplicationAuditor - startAudit] fileFormat:  ${fileFormat}`);
+        AppLogger.info(`[CodeDuplicationAuditor - startDuplicationAudit] directory:  ${directory}`);
+        AppLogger.info(`[CodeDuplicationAuditor - startDuplicationAudit] outputDir:  ${outputDir}`);
+        AppLogger.info(
+            `[CodeDuplicationAuditor - startDuplicationAudit] fileFormat:  ${fileFormat}`,
+        );
 
         // execute audit
         const codeDuplicationCommand = `pnpm jscpd --silent --mode "${codeDuplicationDefaultOptions.mode}" --threshold ${codeDuplicationDefaultOptions.threshold} --reporters "${fileFormat}" --output "${outputDir}" --format "${codeDuplicationDefaultOptions.format}" --ignore "${codeDuplicationDefaultOptions.ignore.join(',')}" ${directory}`;
         AppLogger.info(
-            `[CodeDuplicationAuditor - startAudit] jscpd script:  ${codeDuplicationCommand}`,
+            `[CodeDuplicationAuditor - startDuplicationAudit] jscpd script:  ${codeDuplicationCommand}`,
         );
 
         // generate report
@@ -31,7 +31,7 @@ const startAudit = async (directory, outputDir, fileFormat) => {
             execSync(codeDuplicationCommand, { stdio: 'ignore' });
         } catch (error) {
             AppLogger.info(
-                `[CodeDuplicationAuditor - startAudit] execSync error:  ${error.message}`,
+                `[CodeDuplicationAuditor - startDuplicationAudit] execSync error:  ${error.message}`,
             );
         }
 
@@ -49,13 +49,7 @@ const startAudit = async (directory, outputDir, fileFormat) => {
 
         return true;
     } catch (error) {
-        AppLogger.info(`[CodeDuplicationAuditor - startAudit] error:  ${error.message}`);
+        AppLogger.info(`[CodeDuplicationAuditor - startDuplicationAudit] error:  ${error.message}`);
         return false;
     }
 };
-
-const CodeDuplicationAuditor = {
-    startAudit,
-};
-
-export default CodeDuplicationAuditor;

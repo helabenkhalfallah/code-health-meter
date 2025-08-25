@@ -6,7 +6,7 @@ import Matcher from '../../commons/Matcher.js';
  * @param {Object} reports - The reports grouped by file
  * @returns {string} - The html report
  */
-const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
+export const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
     const codeComplexityReport = { summary, reports };
 
     return `<!DOCTYPE html>
@@ -124,7 +124,7 @@ const formatCodeComplexityHtmlReport = ({ summary, reports }) => {
  * @param {string} file
  * @return {*[]}
  */
-const formatHalsteadReports = (halsteadMetrics, file) => {
+export const formatHalsteadReports = (halsteadMetrics, file) => {
     const { bugs, difficulty, effort, length, time, volume } = halsteadMetrics || {};
 
     const halsteadReports = [];
@@ -241,7 +241,7 @@ const formatHalsteadReports = (halsteadMetrics, file) => {
  * @return {object}
  *
  * */
-const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
+export const formatCyclomaticComplexityReport = (cyclomaticMetric, file) => {
     const complexityStatus = Matcher()
         .on(
             () => cyclomaticMetric <= 10,
@@ -289,7 +289,7 @@ The cyclomatic complexity report (or McCabe complexity report) presents the cycl
  * @param {string} file
  * @return {object}
  * */
-const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
+export const formatMaintainabilityIndexReport = (fileMaintainability, file) => {
     const maintainabilityStatus = Matcher()
         .on(
             () => Math.round(fileMaintainability || 0) < 65,
@@ -352,7 +352,7 @@ The maintainability index report presents the maintainability, McCabe and Halste
  * const indicators = formatFileSLOCIndicators(fileSLOC, file);
  * console.log(indicators);
  */
-const formatFileSLOCIndicators = (fileSLOC, file) => {
+export const formatFileSLOCIndicators = (fileSLOC, file) => {
     const codeSLOCIndicators = [];
 
     if (fileSLOC && file) {
@@ -390,13 +390,3 @@ const formatFileSLOCIndicators = (fileSLOC, file) => {
 
     return codeSLOCIndicators;
 };
-
-const CodeComplexityConfig = {
-    formatHalsteadReports,
-    formatMaintainabilityIndexReport,
-    formatCyclomaticComplexityReport,
-    formatFileSLOCIndicators,
-    formatCodeComplexityHtmlReport,
-};
-
-export default CodeComplexityConfig;

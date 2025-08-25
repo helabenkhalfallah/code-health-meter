@@ -4,30 +4,13 @@ import path from 'path';
 import TyphonEscomplex from 'typhonjs-escomplex';
 
 import AppLogger from '../../commons/AppLogger.js';
-import AuditUtils from '../../commons/AuditUtils.js';
-import CodeComplexityConfig from './CodeComplexityConfig.js';
-
-const { formatCodeComplexityHtmlReport } = CodeComplexityConfig;
-
-const { getFiles, parseFile } = AuditUtils;
-
-/**
- * Parser options for the escomplex module analyzer.
- * @type {Object}
- */
-const ComplexityParserOptions = {
-    sourceType: 'module',
-    plugins: [
-        'jsx',
-        'objectRestSpread',
-        'classProperties',
-        'optionalCatchBinding',
-        'asyncGenerators',
-        'decorators-legacy',
-        'typescript',
-        'dynamicImport',
-    ],
-};
+import {
+    complexityParserOptions,
+    complexityReportOptions,
+    getFiles,
+    parseFile,
+} from '../../commons/AuditUtils.js';
+import { formatCodeComplexityHtmlReport } from './CodeComplexityConfig.js';
 
 /**
  * Processes the source code to generate a complexity report.
@@ -51,7 +34,7 @@ function process(source, options, reportInfo) {
     // http://www.literateprogramming.com/mccabe.pdf
     // http://horst-zuse.homepage.t-online.de/z-halstead-final-05-1.pdf
     // https://avandeursen.com/2014/08/29/think-twice-before-using-the-maintainability-index/
-    const report = TyphonEscomplex.analyzeModule(source, options, ComplexityParserOptions);
+    const report = TyphonEscomplex.analyzeModule(source, options, complexityParserOptions);
     AppLogger.info(`[CodeComplexityUtils - process] report:  ${report}`);
 
     // Make the short filename easily accessible
@@ -100,21 +83,9 @@ function process(source, options, reportInfo) {
  * An object containing the complexity analyzer.
  * @type {Object}
  */
-const analyzers = {
+export const analyzers = {
     complexity: {
         process,
-    },
-};
-
-/**
- * An object containing the options for the complexity report.
- * @type {Object}
- */
-const complexityReportOptions = {
-    complexity: {
-        loc: true,
-        newmi: true,
-        range: true,
     },
 };
 
@@ -123,7 +94,7 @@ const complexityReportOptions = {
  * @param {Array} reports - The reports to filter.
  * @returns {Object} - Returns an object containing the summary and files.
  */
-const getOverviewReport = (reports) => {
+export const getOverviewReport = (reports) => {
     AppLogger.info(`[CodeComplexityUtils - getOverviewReport] reports:  ${reports?.length}`);
 
     const moduleFiles = [];
@@ -270,7 +241,7 @@ const inspectFiles = (srcDir, options) => {
  * @param {Object} params - The parameters for the inspection.
  * @returns {Object} - Returns an object containing the overview report.
  */
-const inspectDirectory = ({ srcDir, options }) => {
+export const inspectDirectory = ({ srcDir, options }) => {
     try {
         AppLogger.info(`[CodeComplexityUtils - inspectDirectory] srcDir:  ${srcDir}`);
 
@@ -312,7 +283,7 @@ const groupCodeComplexityReportsByFile = (reports) =>
  * @param {string} fileFormat - The format of the file.
  * @returns {string} - Returns a string with the formatted reports.
  */
-const formatCodeComplexityAuditReports = ({ summary, auditReports, fileFormat }) => {
+export const formatCodeComplexityAuditReports = ({ summary, auditReports, fileFormat }) => {
     const reportsByFile = groupCodeComplexityReportsByFile(auditReports);
 
     if (fileFormat === 'json') {
@@ -349,7 +320,7 @@ const formatCodeComplexityAuditReports = ({ summary, auditReports, fileFormat })
  * @returns {boolean} Returns true if the file was written successfully, false otherwise.
  * @throws {Error} If an error occurs while writing the file.
  */
-const writeCodeComplexityAuditToFile = ({
+export const writeCodeComplexityAuditToFile = ({
     codeComplexityOptions,
     codeComplexityAnalysisResult,
 }) => {
@@ -411,15 +382,3 @@ const writeCodeComplexityAuditToFile = ({
         return false;
     }
 };
-
-/**
- * The CodeComplexityUtils object.
- * @typedef {Object} CodeComplexityUtils
- * @property {function} inspectDirectory - Inspects the source directory.
- */
-const CodeComplexityUtils = {
-    inspectDirectory,
-    writeCodeComplexityAuditToFile,
-};
-
-export default CodeComplexityUtils;

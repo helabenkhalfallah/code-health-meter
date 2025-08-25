@@ -14,7 +14,7 @@ import AppLogger from './AppLogger.js';
  * @property {true} allowSelfLoops - Allows self-loops in the graph.
  * @property {false} multi - Disallows multiple edges between the same pair of nodes.
  */
-const graphologyDefaultOptions = {
+export const graphologyDefaultOptions = {
     type: 'directed',
     allowSelfLoops: true,
     multi: false,
@@ -25,7 +25,7 @@ const graphologyDefaultOptions = {
  * @const {Object} louvainDefaultOptions
  * @property {number} resolution - Resolution parameter for the Louvain algorithm (default: 1).
  */
-const louvainDefaultOptions = {
+export const louvainDefaultOptions = {
     resolution: 0.74,
 };
 
@@ -33,7 +33,7 @@ const louvainDefaultOptions = {
  * Default options for the Madge analysis.
  * @type {{fileExtensions: string[], excludeRegExp: string[]}}
  */
-const madgeDefaultOptions = {
+export const madgeDefaultOptions = {
     fileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     excludeRegExp: [
         '.*node_modules/.*',
@@ -70,7 +70,7 @@ const madgeDefaultOptions = {
 /**
  * Default options for the code duplication analysis.
  * */
-const codeDuplicationDefaultOptions = {
+export const codeDuplicationDefaultOptions = {
     mode: 'strict',
     threshold: 0,
     format: ['javascript', 'typescript', 'jsx', 'tsx'],
@@ -120,11 +120,41 @@ const codeDuplicationDefaultOptions = {
 };
 
 /**
+ * Parser options for the escomplex module analyzer.
+ * @type {Object}
+ */
+export const complexityParserOptions = {
+    sourceType: 'module',
+    plugins: [
+        'jsx',
+        'objectRestSpread',
+        'classProperties',
+        'optionalCatchBinding',
+        'asyncGenerators',
+        'decorators-legacy',
+        'typescript',
+        'dynamicImport',
+    ],
+};
+
+/**
+ * An object containing the options for the complexity report.
+ * @type {Object}
+ */
+export const complexityReportOptions = {
+    complexity: {
+        loc: true,
+        newmi: true,
+        range: true,
+    },
+};
+
+/**
  * Checks if a file is of an accepted type.
  * @param {string} fileName - The name of the file.
  * @returns {boolean} - Returns true if the file is of an accepted type, false otherwise.
  */
-const isAcceptedFileType = (fileName) =>
+export const isAcceptedFileType = (fileName) =>
     fileName?.endsWith('.js') ||
     fileName?.endsWith('.jsx') ||
     fileName?.endsWith('.ts') ||
@@ -136,7 +166,7 @@ const isAcceptedFileType = (fileName) =>
  * @param {string} filePath - The path of the file.
  * @returns {boolean} - Returns true if the file is excluded, false otherwise.
  */
-const isExcludedFile = (filePath) =>
+export const isExcludedFile = (filePath) =>
     filePath?.toLowerCase()?.includes('snap') ||
     filePath?.toLowerCase()?.includes('mock') ||
     filePath?.toLowerCase()?.includes('jest') ||
@@ -182,7 +212,7 @@ const isExcludedFile = (filePath) =>
  * const content = await getAuditedFileContent('/path/to/file');
  * print(content); // Logs the content of the file.
  */
-const getFileContent = async (filePath) => {
+export const getFileContent = async (filePath) => {
     try {
         const fileStreamReader = fs.createReadStream(filePath);
 
@@ -211,7 +241,7 @@ const getFileContent = async (filePath) => {
  * const result = await isNonCompliantFile('anti-pattern', '/path/to/file');
  * print(result); // Logs true if the file contains the anti-pattern, false otherwise.
  */
-const isNonCompliantFile = async (antiPattern, source) => {
+export const isNonCompliantFile = async (antiPattern, source) => {
     try {
         if (!antiPattern?.length || !source?.length) {
             return false;
@@ -292,7 +322,7 @@ const patternToFile = (pattern) => glob.sync(unixify(pattern));
  * print(result.files); // Logs the array of files.
  * print(result.basePath); // Logs the base path.
  */
-const getFiles = (srcDir) => {
+export const getFiles = (srcDir) => {
     try {
         AppLogger.info(`[AuditUtils - parseFiles] srcDir:  ${srcDir}`);
 
@@ -329,7 +359,7 @@ const getFiles = (srcDir) => {
  * @param {boolean} [options.noempty] - Whether to skip empty lines.
  * @returns {Object|null} An object containing the file information, or null if the file is excluded or not a JavaScript/TypeScript file.
  */
-const parseFile = (file, basePath, options) => {
+export const parseFile = (file, basePath, options) => {
     AppLogger.info(`[AuditUtils - parseFile] file:  ${file}`);
     AppLogger.info(`[AuditUtils - parseFile] basePath:  ${basePath}`);
     AppLogger.info(`[AuditUtils - parseFile] options:  ${options}`);
@@ -394,25 +424,9 @@ const parseFile = (file, basePath, options) => {
  * @param {string} value - Value to hashify
  * @returns {string | null}
  */
-const generateHash = (value) => {
+export const generateHash = (value) => {
     if (!value) {
         return null;
     }
     return crypto.createHash('md5').update(JSON.stringify(value)).digest('hex');
 };
-
-const AuditUtils = {
-    isAcceptedFileType,
-    isExcludedFile,
-    getFiles,
-    generateHash,
-    parseFile,
-    getFileContent,
-    isNonCompliantFile,
-    madgeDefaultOptions,
-    graphologyDefaultOptions,
-    louvainDefaultOptions,
-    codeDuplicationDefaultOptions,
-};
-
-export default AuditUtils;
