@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15501897.svg)](https://doi.org/10.5281/zenodo.15501897)
+[![npm version](https://img.shields.io/npm/v/code-health-meter.svg?color=blue)](https://www.npmjs.com/package/code-health-meter)
+
 # 📊 Code Health Meter
 
 > **TOSEM 2025 Publication**  
