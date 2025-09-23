@@ -1,7 +1,7 @@
+# 📊 Code Health Meter
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15501897.svg)](https://doi.org/10.5281/zenodo.15501897)
 [![npm version](https://img.shields.io/npm/v/code-health-meter.svg?color=blue)](https://www.npmjs.com/package/code-health-meter)
-
-# 📊 Code Health Meter
 
 > **TOSEM 2025 Publication**  
 > _Code Health Meter: A Quantitative and Graph-Theoretic Foundation for Automated Code Quality and Architecture Assessment_  
@@ -27,38 +27,64 @@ The system computes:
 ## 📥 Installation
 
 ```bash
-pnpm install -D code-health-meter
-yarn install -D code-health-meter
-npm install -D code-health-meter
+# choose one package manager
+pnpm add -D code-health-meter
+yarn add -D code-health-meter
+npm i -D code-health-meter
 ```
 
 ### Prerequisites
 
 - Node.js ≥ 18.x
-- Graphviz (e.g., `brew install graphviz` or `apt install graphviz`)
+- (Optional for SVG export) **Graphviz**  
+  macOS: `brew install graphviz` • Debian/Ubuntu: `sudo apt install graphviz`
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (no install vs local install)
+
+> **Why two ways?**  
+> • **One‑off runs**: use *npx* (npm) or *dlx* (pnpm) to download & execute temporarily.  
+> • **Local runs**: install the package, then use *exec* (pnpm) or *npx* (npm) so the binary resolves from your workspace.
+
+### One‑off (no install)
 
 ```bash
-npx code-health-meter --srcDir "./tests/mock-project" --format json
+# npm
+npx code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+
+# pnpm (equivalent of npx)
+pnpm dlx code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
 ```
 
-✅ Generates `CodeComplexityReport.json`, `CodeModularityReport.json`, and `jscpd-report.json` under `tests/output/`.
+### After installing locally
+
+```bash
+# pnpm
+pnpm exec code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+
+# npm
+npx code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+```
+
+> **Heads‑up (pnpm):** `pnpm code-health-meter` is **not** a CLI invocation; pnpm treats that as a script name.  
+> Use `pnpm dlx …` (no install) or `pnpm exec …` (after installing).
+
+**Supported formats:** `html`, `json`, or `html,json` for both.
 
 ---
 
-## 🚦 CLI Usage
-
-Run the tool with:
+## 🚦 CLI Usage (copy‑paste)
 
 ```bash
-npx code-health-meter   --srcDir "./tests/mock-project"   --outputDir "./tests/output"   --format html
-pnpm code-health-meter  --srcDir "./tests/mock-project"   --outputDir "./tests/output"   --format html
-```
+# One‑off
+npx  code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+pnpm dlx code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
 
-Supported formats: `html`, `json`, or both.
+# Installed locally
+pnpm exec code-health-meter --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+```
+> Tip (scripts): add `"scan": "code-health-meter --srcDir ./tests/mock-project --outputDir ./tests/output --format html"` and run `pnpm run scan` / `yarn run scan` / `npm run scan`.
 
 ---
 
@@ -70,7 +96,7 @@ To replicate the analysis presented in the paper:
 git clone https://github.com/helabenkhalfallah/code-health-meter.git
 cd code-health-meter
 pnpm install
-pnpm scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
+pnpm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html
 ```
 
 ### Output:
@@ -187,10 +213,49 @@ const dup = JSON.parse(
 console.log("clones:", dup.total?.clones || dup.statistics?.total?.clones);
 ```
 
-#### Duplication — Fixed Reproducibility
+**Duplication — fixed reproducibility**  
+✅ In `tests/mock-project`, CHM identifies **1 clone of 6 lines**, matching the expected test results.
 
-The duplication module now correctly detects cloned code.  
-✅ In the `tests/mock-project`, CHM identifies **1 clone of 6 lines**, matching the expected test results.
+---
+
+## 🔍 Notes on Determinism & Reproducibility
+
+- Dependency graph is **directed** by default; centralities computed accordingly
+- Louvain (Graphology) provides stable results for a fixed toolchain
+- CHM favors a **single‑pass** complexity pipeline (compute once, reuse entries)
+
+---
+
+## 🧯 Troubleshooting
+
+- **pnpm: `Command "code-health-meter" not found`**  
+  Use `pnpm dlx code-health-meter …` (no install) or `pnpm exec code-health-meter …` (after `pnpm add -D code-health-meter`).
+
+- **Missing SVGs**  
+  Install Graphviz (`brew install graphviz` or `apt install graphviz`), or run with `--format json` if SVGs aren’t needed.
+
+- **No outputs produced**  
+  Ensure `--outputDir` exists or is creatable; CHM creates it and writes:  
+  `CodeComplexityReport.{html|json}`, `CodeModularityReport.{html|json|svg}`, `code-duplication-audit/…`.
+
+---
+
+## 🤝 Contributing
+
+```bash
+git clone https://github.com/helabenkhalfallah/code-health-meter.git
+cd code-health-meter
+pnpm install
+pnpm run scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html,json
+```
+
+---
+
+## 📝 Response to Reviewers (TOSEM 2025 RCR)
+
+- **Functional**: Clarified pnpm usage (`dlx`/`exec`) to eliminate “command not found”.
+- **Reproducibility**: Duplication detection now deterministic (1 clone / 6 lines in `tests/mock-project`).
+- **Reusable**: Exposed Cyclomatic & Halstead builders as public APIs; added guidance on analyzed entries.
 
 ---
 
@@ -205,38 +270,6 @@ The duplication module now correctly detects cloned code.
   note      = {To appear},
 }
 ```
-
----
-
-## 🔍 Notes on Determinism & Reproducibility
-
-- The dependency graph is **directed** by default; centralities are computed on this directed graph.
-- Louvain community detection is provided by Graphology; results are stable for a given codebase and toolchain.
-- CHM favors a **single-pass** pipeline for complexity (compute once, reuse entries across metrics).
-
----
-
-## 🤝 Contributing
-
-```bash
-git clone https://github.com/helabenkhalfallah/code-health-meter.git
-cd code-health-meter
-pnpm install
-```
-
-Run:
-
-```bash
-pnpm scan --srcDir "./tests/mock-project" --outputDir "./tests/output" --format html,json
-```
-
----
-
-## 📝 Response to Reviewers (TOSEM 2025 RCR)
-
-- **Functional Badge**: Fixed duplication detection reproducibility (1 clone of 6 lines detected in `tests/mock-project`).
-- **Reusable Badge**: Exposed Cyclomatic Complexity and Halstead metrics as reusable functions. Documented rationale for metrics embedded in higher-level modules.
-- **Documentation**: Expanded test instructions, clarified programmatic APIs, and detailed reproducibility notes.
 
 ---
 
